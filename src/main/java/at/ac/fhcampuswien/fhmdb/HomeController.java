@@ -1,6 +1,8 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
+import at.ac.fhcampuswien.fhmdb.models.MovieComparator;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -44,6 +46,7 @@ public class HomeController implements Initializable {
         movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
 
         // TODO add genre filter items with genreComboBox.getItems().addAll(...)
+        genreComboBox.getItems().addAll(Genre.values());
         genreComboBox.setPromptText("Filter by Genre");
 
         // TODO add event handlers to buttons and call the regarding methods
@@ -51,15 +54,29 @@ public class HomeController implements Initializable {
 
         // Sort button example:
         sortBtn.setOnAction(actionEvent -> {
-            if(sortBtn.getText().equals("Sort (asc)")) {
-                // TODO sort observableMovies ascending
-                sortBtn.setText("Sort (desc)");
-            } else {
-                // TODO sort observableMovies descending
-                sortBtn.setText("Sort (asc)");
-            }
+                sortMovies(observableMovies);
         });
 
+
+
+    }
+
+    public List<Movie> sortMovies(List<Movie> observableMovies)
+    {
+        movieListView = new JFXListView<>();
+        if(sortBtn.getText().equals("Sort (asc)"))
+        {
+            observableMovies.sort(new MovieComparator());
+            sortBtn.setText("Sort (desc)");
+        }
+        else
+        {
+            observableMovies.sort(new MovieComparator().reversed());
+            sortBtn.setText("Sort (asc)");
+        }
+        movieListView.setItems((ObservableList) observableMovies);   // set data of observable list to list view
+        movieListView.setCellFactory(movieListView -> new MovieCell());
+        return(observableMovies);
 
     }
 }
