@@ -1,11 +1,15 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.models.Genre;
+import at.ac.fhcampuswien.fhmdb.models.Movie;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class FhmdbApplication extends Application {
@@ -21,6 +25,9 @@ public class FhmdbApplication extends Application {
     }
 
     public static void main(String[] args) {
+        ArrayList<Genre> genres = new ArrayList<>(Arrays.asList(Genre.WAR,Genre.ACTION));
+        Movie movie = new Movie("My","mov",genres);
+        System.out.println(movie);
         launch();
     }
 }
