@@ -51,4 +51,20 @@ public class Movie {
     {
         return("Title:"+title+"desc:"+description+"Genre:"+genres);
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+
+        if(obj instanceof  Movie)
+        {
+            Movie movie = (Movie) obj;
+            if (this.title.equals(movie.title))
+            {
+                return true;
+            }
+        }
+        return false;
+
+    }
 }

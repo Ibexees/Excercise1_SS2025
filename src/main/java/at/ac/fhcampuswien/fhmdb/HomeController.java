@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -35,7 +36,7 @@ public class HomeController implements Initializable {
 
     public List<Movie> allMovies = Movie.initializeMovies();
 
-    private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
+    private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -45,7 +46,6 @@ public class HomeController implements Initializable {
         movieListView.setItems(observableMovies);   // set data of observable list to list view
         movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
 
-        // TODO add genre filter items with genreComboBox.getItems().addAll(...)
         genreComboBox.getItems().addAll(Genre.values());
         genreComboBox.setPromptText("Filter by Genre");
 
@@ -54,28 +54,45 @@ public class HomeController implements Initializable {
 
         // Sort button example:
         sortBtn.setOnAction(actionEvent -> {
-                sortMovies(observableMovies);
+            //movieList Leeren
+            movieListView = new JFXListView<>();
+            if(sortBtn.getText().equals("Sort (asc)"))
+            {
+                    boolean asc = true;
+                    observableMovies = (ObservableList<Movie>) sortMovies(asc,observableMovies);
+                    sortBtn.setText("Sort (desc)");
+            }
+           else
+            {
+                boolean asc = false;
+                observableMovies = (ObservableList<Movie>) sortMovies(asc,observableMovies);
+                sortBtn.setText("Sort (asc)");
+            }
+            movieListView.setItems( observableMovies);   // set data of observable list to list view
+            movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
         });
 
 
 
     }
 
-    public List<Movie> sortMovies(List<Movie> observableMovies)
+    //TODO: Write Method
+    public void filterMovies(Genre genres, String filtertext)
     {
-        movieListView = new JFXListView<>();
-        if(sortBtn.getText().equals("Sort (asc)"))
-        {
-            observableMovies.sort(new MovieComparator());
-            sortBtn.setText("Sort (desc)");
-        }
-        else
-        {
-            observableMovies.sort(new MovieComparator().reversed());
-            sortBtn.setText("Sort (asc)");
-        }
-        movieListView.setItems((ObservableList) observableMovies);   // set data of observable list to list view
-        movieListView.setCellFactory(movieListView -> new MovieCell());
+
+    }
+
+
+
+    public List<Movie> sortMovies(boolean sortLogic,List<Movie> observableMovies)
+    {
+            //Aufsteigend sortieren mit MovieComparator Klasse
+            if(sortLogic)
+            {observableMovies.sort(new MovieComparator());}
+            else
+            {//Aufsteigend sortieren mit MovieComparator Klasse
+            observableMovies.sort(new MovieComparator().reversed());}
+
         return(observableMovies);
 
     }
