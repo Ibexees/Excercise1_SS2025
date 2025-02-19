@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -34,23 +35,29 @@ public class HomeController implements Initializable {
     @FXML
     public JFXButton sortBtn;
 
+    private boolean isSet = false;
+
     public List<Movie> allMovies = Movie.initializeMovies();
 
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        observableMovies.addAll(allMovies);         // add dummy data to observable list
+        if (!isSet) {
+            observableMovies.addAll(allMovies);         // add dummy data to observable list
 
-        // initialize UI stuff
-        movieListView.setItems(observableMovies);   // set data of observable list to list view
-        movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
+            // initialize UI stuff
+            movieListView.setItems(observableMovies);   // set data of observable list to list view
+            movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
 
-        genreComboBox.getItems().addAll(Genre.values());
-        genreComboBox.setPromptText("Filter by Genre");
+            genreComboBox.getItems().addAll(Genre.values());
+            genreComboBox.setPromptText("Filter by Genre");
+            isSet = true;
+        }
 
         // TODO add event handlers to buttons and call the regarding methods
         // either set event handlers in the fxml file (onAction) or add them here
+        searchBtn.setOnAction(this::handle);
 
         // Sort button example:
         sortBtn.setOnAction(actionEvent -> {
@@ -77,9 +84,16 @@ public class HomeController implements Initializable {
     }
 
     //TODO: Write Method
-    public void filterMovies(Genre genres, String filtertext)
+    public List<Movie> filterMovies(Genre genres, String filtertext)
     {
-
+        observableMovies.clear();
+        ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();
+        for (Movie movie : allMovies) {
+            if(movie.getGenres() != null && movie.getGenres().contains(genres)) {
+                filteredObservableMovies.add(movie);
+            }
+        }
+        return filteredObservableMovies;
     }
 
 
@@ -94,6 +108,33 @@ public class HomeController implements Initializable {
             observableMovies.sort(new MovieComparator().reversed());}
 
         return(observableMovies);
+
+    }
+
+    private void handle(ActionEvent actionEvent) {
+        System.out.println("Filter Button pressed");
+        String searchText = searchField.getText();
+        Genre genre = null;
+
+        if (genreComboBox.getSelectionModel().getSelectedItem() != null) {
+            genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
+        }
+
+        ObservableList<Movie> filteredMovies = (ObservableList<Movie>) filterMovies(genre, searchText);
+
+        System.out.println("ObservableMovies after filtering: " + filteredMovies);
+        ObservableList<Movie> observableMovies2 = FXCollections.observableArrayList();
+        movieListView.setItems(observableMovies2);
+        movieListView.setCellFactory(null);
+        movieListView.setCellFactory(movieListView -> new MovieCell());
+// Perform some operations like clearing the items (if needed)
+        observableMovies.clear();
+        observableMovies.setAll(filteredMovies);
+        //movieListView.setItems(observableMovies);
+        movieListView.setItems(observableMovies);
+
+// Reapply the custom cellFactory
+
 
     }
 }
