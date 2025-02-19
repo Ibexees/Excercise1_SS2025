@@ -41,6 +41,16 @@ public class Movie {
         movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)));
         movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
         movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
+        movies.add(new Movie("Inception", "A dream within a dream", Arrays.asList(Genre.SCIENCE_FICTION, Genre.THRILLER)));
+        movies.add(new Movie("The Dark Knight", "The rise of the Batman", Arrays.asList(Genre.ACTION, Genre.CRIME, Genre.DRAMA)));
+        movies.add(new Movie("Interstellar", "Love and science beyond time", Arrays.asList(Genre.SCIENCE_FICTION, Genre.DRAMA, Genre.ADVENTURE)));
+        movies.add(new Movie("The Grand Budapest Hotel", "A whimsical tale of adventure and crime", Arrays.asList(Genre.COMEDY, Genre.CRIME, Genre.DRAMA)));
+        movies.add(new Movie("Whiplash", "The cost of greatness", Arrays.asList(Genre.DRAMA, Genre.DOCUMENTARY)));
+        movies.add(new Movie("Gladiator", "A general becomes a gladiator", Arrays.asList(Genre.ACTION, Genre.DRAMA, Genre.HISTORY)));
+        movies.add(new Movie("The Conjuring", "Based on true paranormal investigations", Arrays.asList(Genre.HORROR, Genre.THRILLER)));
+        movies.add(new Movie("The Revenant", "Survival against all odds", Arrays.asList(Genre.ADVENTURE, Genre.DRAMA, Genre.WESTERN)));
+        movies.add(new Movie("Coco", "A boy's journey through the Land of the Dead", Arrays.asList(Genre.ANIMATION, Genre.FAMILY, Genre.MUSICAL)));
+        movies.add(new Movie("Mad Max: Fury Road", "A high-octane road to redemption", Arrays.asList(Genre.ACTION, Genre.ADVENTURE, Genre.SCIENCE_FICTION)));
         // TODO add some dummy data here
 
         return movies;

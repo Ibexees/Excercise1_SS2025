@@ -7,15 +7,17 @@ import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -35,15 +37,25 @@ public class HomeController implements Initializable {
     @FXML
     public JFXButton sortBtn;
 
-    private boolean isSet = false;
+    @FXML
+    public HBox upperHbox;
+
+    @FXML
+    public JFXButton resetBtn;
+
+    private BooleanProperty isFiltered = new SimpleBooleanProperty(false);
 
     public List<Movie> allMovies = Movie.initializeMovies();
 
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
+    private boolean asc;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        if (!isSet) {
+
+            resetBtn.setDisable(true);
+            resetBtn.setVisible(false);
             observableMovies.addAll(allMovies);         // add dummy data to observable list
 
             // initialize UI stuff
@@ -52,27 +64,33 @@ public class HomeController implements Initializable {
 
             genreComboBox.getItems().addAll(Genre.values());
             genreComboBox.setPromptText("Filter by Genre");
-            isSet = true;
-        }
 
         // TODO add event handlers to buttons and call the regarding methods
         // either set event handlers in the fxml file (onAction) or add them here
-        searchBtn.setOnAction(this::handle);
+        searchBtn.setOnAction(this::handleFilter);
+
+        resetBtn.setOnAction(this::handleReset);
+
+        isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
 
         // Sort button example:
         sortBtn.setOnAction(actionEvent -> {
             //movieList Leeren
-            movieListView = new JFXListView<>();
+            //movieListView = new JFXListView<>(); //braucht man nicht, würde mit filtern auch nicht funktionieren (von Elias)
             if(sortBtn.getText().equals("Sort (asc)"))
             {
-                    boolean asc = true;
+                    asc = true;
+                    allMovies = sortMovies(asc,allMovies); //damit alle Movies sortieren, ist relevant für das Filtern.
                     observableMovies = (ObservableList<Movie>) sortMovies(asc,observableMovies);
+
                     sortBtn.setText("Sort (desc)");
             }
            else
             {
-                boolean asc = false;
+                asc = false;
+                allMovies = sortMovies(asc,allMovies); //damit alle Movies sortieren, ist relevant für das Filtern.
                 observableMovies = (ObservableList<Movie>) sortMovies(asc,observableMovies);
+
                 sortBtn.setText("Sort (asc)");
             }
             movieListView.setItems( observableMovies);   // set data of observable list to list view
@@ -83,19 +101,20 @@ public class HomeController implements Initializable {
 
     }
 
-    //TODO: Write Method
-    public List<Movie> filterMovies(Genre genres, String filtertext)
-    {
+    private void handleReset(ActionEvent actionEvent) {
         observableMovies.clear();
-        ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();
-        for (Movie movie : allMovies) {
-            if(movie.getGenres() != null && movie.getGenres().contains(genres)) {
-                filteredObservableMovies.add(movie);
-            }
-        }
-        return filteredObservableMovies;
-    }
+        observableMovies.addAll(allMovies);
+        movieListView.setItems(observableMovies);
 
+        resetBtn.setVisible(false);
+        resetBtn.setManaged(false);
+        resetBtn.setDisable(true);
+
+        genreComboBox.setPromptText("Filter by Genre");
+        genreComboBox.resetValidation();
+        searchField.clear();
+        isFiltered.set(false);
+    }
 
 
     public List<Movie> sortMovies(boolean sortLogic,List<Movie> observableMovies)
@@ -111,7 +130,7 @@ public class HomeController implements Initializable {
 
     }
 
-    private void handle(ActionEvent actionEvent) {
+    private void handleFilter(ActionEvent actionEvent) {
         System.out.println("Filter Button pressed");
         String searchText = searchField.getText();
         Genre genre = null;
@@ -120,21 +139,50 @@ public class HomeController implements Initializable {
             genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
         }
 
-        ObservableList<Movie> filteredMovies = (ObservableList<Movie>) filterMovies(genre, searchText);
+        ObservableList<Movie> filteredMovies;
+        filteredMovies = (ObservableList<Movie>) filterMovies(genre, searchText);
+        observableMovies = filteredMovies;
 
-        System.out.println("ObservableMovies after filtering: " + filteredMovies);
-        ObservableList<Movie> observableMovies2 = FXCollections.observableArrayList();
-        movieListView.setItems(observableMovies2);
-        movieListView.setCellFactory(null);
-        movieListView.setCellFactory(movieListView -> new MovieCell());
-// Perform some operations like clearing the items (if needed)
-        observableMovies.clear();
-        observableMovies.setAll(filteredMovies);
-        //movieListView.setItems(observableMovies);
-        movieListView.setItems(observableMovies);
+        movieListView.setItems( observableMovies);
+        movieListView.refresh();
+        isFiltered.set(true);
+    }
 
-// Reapply the custom cellFactory
+    //TODO: Write Method
+    public List<Movie> filterMovies(Genre genres, String searchText)
+    {
+        //observableMovies.clear();
+        ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();
+        for (Movie movie : allMovies) {
+            if(movie.getGenres() != null && movie.getGenres().contains(genres)) {
+                if (searchText.isEmpty()) {
+                    filteredObservableMovies.add(movie);
+                }
+                else {
+                    if (movie.getTitle().toLowerCase().contains(searchText.toLowerCase())) {
+                        filteredObservableMovies.add(movie);
+                    }
+                    else continue;
+                }
 
+            }
+        }
+        return filteredObservableMovies;
+    }
 
+    public void controlResetButton() {
+        if (isFiltered.get()) {
+
+            resetBtn.setVisible(true);
+            resetBtn.setManaged(true);
+            resetBtn.setDisable(false);
+
+        }
+        else {
+
+            resetBtn.setVisible(false);
+            resetBtn.setManaged(false);
+            resetBtn.setDisable(true);
+        }
     }
 }

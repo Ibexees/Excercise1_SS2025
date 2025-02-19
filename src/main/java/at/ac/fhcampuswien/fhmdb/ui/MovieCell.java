@@ -21,6 +21,7 @@ public class MovieCell extends ListCell<Movie> {
 
         if (empty || movie == null) {
             setText(null);
+            setGraphic(null);  //Damit es zu keinen doppelten Einträgen kommt in der UI
         } else {
             this.getStyleClass().add("movie-cell");
             title.setText(movie.getTitle());
