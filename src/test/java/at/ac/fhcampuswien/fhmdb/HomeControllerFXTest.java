@@ -18,6 +18,7 @@ import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static javafx.application.Application.launch;
@@ -65,21 +66,29 @@ public class HomeControllerFXTest extends ApplicationTest
 
     @Test
     void testDescSortButtonUpdatesListView() {
-        // Klicke auf den Button mit der ID #sortBtn
 
+        //Testmöglichkeit für alle Filme in initializeMovies benötigt aber Schleife in Testcase!
+        List<Movie> movies = Movie.initializeMovies();
+        HomeController homeController = new HomeController();
+        boolean asc = false;
+        movies = homeController.sortMovies(asc,movies);
+
+        // Klicke auf den Button mit der ID #sortBtn
         robot.clickOn("#sortBtn"); //Drücken auf den Sortier Knopf
         robot.clickOn("#sortBtn"); //2tes drücken auf den Sortier Knopf, damit desc sortiert wird
 
         // Zugriff auf die ListView
         ListView<Movie> listView = robot.lookup("#movieListView").queryAs(ListView.class);
-        ObservableList<Movie> movies = listView.getItems();
+        ObservableList<Movie> DisplayedMovies = listView.getItems();
 
         // Prüfen, ob die Reihenfolge korrekt ist
-        assertEquals("Into the Spiderverse", movies.get(4).getTitle());
-        assertEquals("Kung Fu Panda", movies.get(3).getTitle());
-        assertEquals("Shutter Island", movies.get(2).getTitle());
-        assertEquals("Southpaw", movies.get(1).getTitle());
-        assertEquals("Your Name", movies.get(0).getTitle());
+        assertEquals("Into the Spiderverse", DisplayedMovies.get(4).getTitle());
+        assertEquals("Kung Fu Panda", DisplayedMovies.get(3).getTitle());
+        assertEquals("Shutter Island", DisplayedMovies.get(2).getTitle());
+        assertEquals("Southpaw", DisplayedMovies.get(1).getTitle());
+        assertEquals("Your Name", DisplayedMovies.get(0).getTitle());
+
+
     }
 }
 
