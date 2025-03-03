@@ -110,7 +110,7 @@ public class HomeController implements Initializable {
         resetBtn.setManaged(false);
         resetBtn.setDisable(true);
 
-        genreComboBox.setPromptText("Filter by Genre");
+        genreComboBox.setValue(null);
         genreComboBox.resetValidation();
         searchField.clear();
         isFiltered.set(false);
@@ -152,9 +152,11 @@ public class HomeController implements Initializable {
     public List<Movie> filterMovies(Genre genres, String searchText)
     {
         //observableMovies.clear();
+
+
         ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();
         for (Movie movie : allMovies) {
-            if(movie.getGenres() != null && movie.getGenres().contains(genres)) {
+            if(movie.getGenres().contains(genres)||genres == null) {
                 if (searchText.isEmpty()) {
                     filteredObservableMovies.add(movie);
                 }
