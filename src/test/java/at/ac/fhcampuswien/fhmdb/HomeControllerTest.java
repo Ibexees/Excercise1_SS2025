@@ -147,8 +147,14 @@ class HomeControllerTest {
     }
 
     @Test //Iyobosa
-    public void title_filter_accepts_substring_of_Movie_title()
-    {
+    public void title_filter_accepts_substring_of_Movie_title(){
+        String searchText = "Name";
+
+        List<Movie> filteredMovies = HomeController.filterMovies(null, searchText);
+
+        assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein");
+        assertEquals(filteredMovies.size(),1, "Es sollte genau ein Film mit 'Name' im Titel gefunden werden");
+        assertEquals("Kung Fu Panda", filteredMovies.get(0).getTitle(), "Der gefundene Film sollte 'Kung Fu Panda' sein");
 
     }
 
