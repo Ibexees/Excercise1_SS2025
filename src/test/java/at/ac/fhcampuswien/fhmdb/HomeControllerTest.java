@@ -148,9 +148,12 @@ class HomeControllerTest {
 
     @Test //Iyobosa
     public void title_filter_accepts_substring_of_Movie_title(){
-        String searchText = "Name";
+        HomeController homeController = new HomeController();
+        homeController.allMovies = Movie.initializeMovies();
 
-        List<Movie> filteredMovies = HomeController.filterMovies(null, searchText);
+        String searchText = "Kung";
+
+        List<Movie> filteredMovies = homeController.filterMovies(null, searchText);
 
         assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein");
         assertEquals(filteredMovies.size(),1, "Es sollte genau ein Film mit 'Name' im Titel gefunden werden");
