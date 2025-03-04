@@ -149,7 +149,9 @@ class HomeControllerTest {
     @Test //Iyobosa
     public void title_filter_accepts_substring_of_Movie_title(){
         HomeController homeController = new HomeController();
-        homeController.allMovies = Movie.initializeMovies();
+
+        List<Movie> testMovies = new ArrayList<>();
+        testMovies.add(new Movie("Kung Fu Panda","Action movie",Arrays.asList(Genre.ACTION)));
 
         String searchText = "Kung";
 
