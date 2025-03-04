@@ -89,7 +89,8 @@ class HomeControllerTest {
 
     @Test //Nancy
     public void title_filter_not_case_sensitive() {
-            List<Movie> movies = Arrays.asList(
+        HomeController homeController = new HomeController();
+        homeController.allMovies = Arrays.asList(
                     new Movie("The Dark Knight","Action movie",Arrays.asList(Genre.ACTION)),
                     new Movie("the dark knight","The battle between batman and joker",Arrays.asList(Genre.ACTION)),
                     new Movie("willy wonka and the chocolate factory","Fantasy movie",Arrays.asList(Genre.FANTASY)),
@@ -102,37 +103,36 @@ class HomeControllerTest {
 
             // suche nach the dark knight
         String searchQuery ="the dark knight";
-        List<Movie> resultDarkKnight =movies.stream().filter(movie -> movie.getTitle().toLowerCase().contains(searchQuery.toLowerCase())).toList();
+        List<Movie> resultDarkKnight =homeController.filterMovies(null,"the dark knight");
 
 
         //erwartete Anzahl an Treffern
         assertEquals(2, resultDarkKnight.size());
-        assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equals("The Dark Knight")));
-        assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equals("the dark knight")));
+        assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("The Dark Knight")));
+        assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("the dark knight")));
 
         //suche willy wonka
         String searchQuery2="willy wonka and the chocolate factory";
-        List<Movie> resultWillyWonka = movies.stream().filter(movie -> movie.getTitle().toLowerCase().contains(searchQuery2.toLowerCase())).toList();
+        List<Movie> resultWillyWonka = homeController.filterMovies(null,"willy wonka and the chocolate factory");
 
         assertEquals(2,resultWillyWonka.size());
-        assertTrue(resultWillyWonka.stream().anyMatch(movie -> movie.getTitle().equals("Willy Wonka And The Chocolate Factory")));
-        assertTrue(resultWillyWonka.stream().anyMatch(movie -> movie.getTitle().equals("willy wonka and the chocolate factory")));
+        assertTrue(resultWillyWonka.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("Willy Wonka And The Chocolate Factory")));
+        assertTrue(resultWillyWonka.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("willy wonka and the chocolate factory")));
 
-        //suche scarface
-        String searchQuery3="scarface";
-        List<Movie> resultScarface = movies.stream().filter(movie -> movie.getTitle().toLowerCase().contains(searchQuery3.toLowerCase())).toList();
+
+        List<Movie> resultScarface = homeController.filterMovies(null,"scarface");
 
         assertEquals(2,resultScarface.size());
-        assertTrue(resultScarface.stream().anyMatch(movie -> movie.getTitle().equals("SCARFACE")));
-        assertTrue(resultScarface.stream().anyMatch(movie -> movie.getTitle().equals("scarface")));
+        assertTrue(resultScarface.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("SCARFACE")));
+        assertTrue(resultScarface.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("scarface")));
 
         //suche superbad
-        String searchQuery4="Superbad";
-        List<Movie> resultSuperbad = movies.stream().filter(movie -> movie.getTitle().toLowerCase().contains(searchQuery4.toLowerCase())).toList();
+
+        List<Movie> resultSuperbad = homeController.filterMovies(null,"Superbad");
 
         assertEquals(2,resultSuperbad.size());
-        assertTrue(resultSuperbad.stream().anyMatch(movie -> movie.getTitle().equals("Superbad")));
-        assertTrue(resultSuperbad.stream().anyMatch(movie -> movie.getTitle().equals("SUPERBAD")));
+        assertTrue(resultSuperbad.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("Superbad")));
+        assertTrue(resultSuperbad.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("SUPERBAD")));
 
 
 
