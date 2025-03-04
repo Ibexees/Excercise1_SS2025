@@ -152,6 +152,7 @@ class HomeControllerTest {
 
         List<Movie> testMovies = new ArrayList<>();
         testMovies.add(new Movie("Kung Fu Panda","Action movie",Arrays.asList(Genre.ACTION)));
+        testMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
 
         String searchText = "Kung";
 

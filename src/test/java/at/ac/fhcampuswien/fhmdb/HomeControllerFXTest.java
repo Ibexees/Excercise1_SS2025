@@ -17,6 +17,7 @@ import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -68,10 +69,19 @@ public class HomeControllerFXTest extends ApplicationTest
     void testDescSortButtonUpdatesListView() {
 
         //Testmöglichkeit für alle Filme in initializeMovies benötigt aber Schleife in Testcase!
-        List<Movie> movies = Movie.initializeMovies();
+        /*List<Movie> movies = new ArrayList<>();
+        movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
+        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
+        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)));
+        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
+        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
+
         HomeController homeController = new HomeController();
         boolean asc = false;
-        movies = homeController.sortMovies(asc,movies);
+
+        homeController.allMovies = movies;
+        homeController.allMovies = homeController.sortMovies(asc,movies);*/
+
 
         // Klicke auf den Button mit der ID #sortBtn
         robot.clickOn("#sortBtn"); //Drücken auf den Sortier Knopf
