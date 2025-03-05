@@ -122,6 +122,7 @@ class HomeControllerTest {
         testMovies.add(new Movie("Kung Fu Panda","Action movie",Arrays.asList(Genre.ACTION)));
         testMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
 
+
         String searchText = "Kung";
 
         List<Movie> filteredMovies = homeController.filterMovies(null, searchText);
@@ -136,12 +137,53 @@ class HomeControllerTest {
     @Test //Elias
     public void only_genre_filtered_Movies_displayed()
     {
+        HomeController homeController = new HomeController();
 
+        //Filme für den Testfall generieren.
+        List<Movie> testMovies = new ArrayList<>();
+        testMovies.add(new Movie("The Dark Knight","Action movie",Arrays.asList(Genre.ACTION)));
+        testMovies.add(new Movie("Mickey Mouse", "Pluto", Arrays.asList(Genre.WAR)));
+        testMovies.add(new Movie("Batman", "Joker", Arrays.asList(Genre.DOCUMENTARY,Genre.SCIENCE_FICTION)));
+        testMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
+
+        homeController.allMovies = testMovies;
+
+        //Nach Genre.ACTION filtern
+        Genre testGenre = Genre.ACTION;
+
+        //Die gefilterten Filme vom HomeController erhalten.
+        List<Movie> filteredMovies = homeController.filterMovies(testGenre,"");
+
+        assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein.");
+        assertEquals(filteredMovies.size(),2, "Es sollten genau zwei Filme mit [ACTION] gefunden werden.");
+        assertEquals("The Dark Knight", filteredMovies.get(0).getTitle(), "The Dark Knight ist [ACTION] Genre.");
+        assertEquals("Into the Spiderverse", filteredMovies.get(1).getTitle(), "Into the Spiderverse ist [ACTION] Genre.");
     }
 
-    @Test //*
+    @Test //Elias
     public void only_genre_and_title_filtered_movies_displayed()
     {
+        HomeController homeController = new HomeController();
 
+        //Filme für den Testfall generieren.
+        List<Movie> testMovies = new ArrayList<>();
+        testMovies.add(new Movie("The Dark Knight","Joker",Arrays.asList(Genre.ACTION)));
+        testMovies.add(new Movie("Batman Begins", "Joker", Arrays.asList(Genre.ACTION,Genre.DRAMA)));
+        testMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
+        testMovies.add(new Movie("The Dark Knight Rises", "Bane", Arrays.asList(Genre.ACTION)));
+
+        homeController.allMovies = testMovies;
+
+        //Nach Genre.ACTION & "Knight" filtern
+        Genre testGenre = Genre.ACTION;
+        String searchText = "Knight";
+
+        //Die gefilterten Filme vom HomeController erhalten.
+        List<Movie> filteredMovies = homeController.filterMovies(testGenre,searchText);
+
+        assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein.");
+        assertEquals(filteredMovies.size(),2, "Es sollten genau zwei Filme mit [ACTION] & den Namen \"Knight\" beinhalten.");
+        assertEquals("The Dark Knight", filteredMovies.get(0).getTitle(), "The Dark Knight ist [ACTION] Genre & der gesuchte String ist enthalten.");
+        assertEquals("The Dark Knight Rises", filteredMovies.get(1).getTitle(), "The Dark Knight Rises ist [ACTION] Genre & der gesuchte String ist enthalten.");
     }
 }
