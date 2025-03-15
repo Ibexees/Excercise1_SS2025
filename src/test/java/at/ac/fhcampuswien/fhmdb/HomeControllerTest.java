@@ -84,9 +84,6 @@ class HomeControllerTest {
 
     }
 
-
-
-
     @Test //Nancy
     public void title_filter_not_case_sensitive() {
         HomeController homeController = new HomeController();
@@ -121,8 +118,7 @@ class HomeControllerTest {
         List<Movie> testMovies = new ArrayList<>();
         testMovies.add(new Movie("Kung Fu Panda","Action movie",Arrays.asList(Genre.ACTION)));
         testMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
-
-
+        
         String searchText = "Kung";
 
         List<Movie> filteredMovies = homeController.filterMovies(null, searchText);
