@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Scanner;
 
-public class ApiController {
+public class MovieAPI {
 
     public static String getMovies(Map<String, String> params) throws IOException {
         StringBuilder response = new StringBuilder();
@@ -17,6 +17,7 @@ public class ApiController {
 
         if (params != null && !params.isEmpty()) {
             urlBuilder.append("?");
+            /*
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 urlBuilder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8))
                         .append("=")
@@ -25,7 +26,13 @@ public class ApiController {
 
             }
             urlBuilder.deleteCharAt(urlBuilder.length() - 1);
+*/
+            //mit Java Streams
+            params.entrySet().stream()
+                    .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+                    .forEach(param -> urlBuilder.append(param).append("&"));
 
+            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
         }
 
         URL url = new URL(urlBuilder.toString());

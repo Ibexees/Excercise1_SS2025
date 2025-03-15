@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HomeControllerTest {
 
 
+    //Muss auf die neuen Attribute (releaseYear etc.) erweitert werden.
     @Test
     public void movie_should_have_Attributes()
     {
@@ -118,7 +119,9 @@ class HomeControllerTest {
         List<Movie> testMovies = new ArrayList<>();
         testMovies.add(new Movie("Kung Fu Panda","Action movie",Arrays.asList(Genre.ACTION)));
         testMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
-        
+
+        homeController.allMovies = testMovies; //von Elias
+
         String searchText = "Kung";
 
         List<Movie> filteredMovies = homeController.filterMovies(null, searchText);

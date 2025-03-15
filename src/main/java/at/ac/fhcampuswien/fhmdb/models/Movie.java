@@ -1,11 +1,10 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
-import at.ac.fhcampuswien.fhmdb.api.ApiController;
+import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
-import java.rmi.server.UID;
 import java.util.*;
 
 public class Movie {
@@ -54,9 +53,9 @@ public class Movie {
         String apiResponse;
         Map<String, String> emptyParameters = new HashMap<>();
         try {
-            apiResponse = ApiController.getMovies(emptyParameters);
+            apiResponse = MovieAPI.getMovies(emptyParameters);
             System.out.println(apiResponse);
-            movies = Deserializer.deserializeJson(apiResponse);
+            movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
