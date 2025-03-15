@@ -25,9 +25,6 @@ public class FhmdbApplication extends Application {
     }
 
     public static void main(String[] args) {
-        ArrayList<Genre> genres = new ArrayList<>(Arrays.asList(Genre.WAR,Genre.ACTION));
-        Movie movie = new Movie("My","mov",genres);
-        System.out.println(movie);
         launch();
     }
 }
