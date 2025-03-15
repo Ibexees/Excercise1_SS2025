@@ -151,10 +151,8 @@ public class HomeController implements Initializable {
     //TODO: Write Method
     public List<Movie> filterMovies(Genre genres, String searchText)
     {
-        //observableMovies.clear();
-
-
         ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();
+
         for (Movie movie : allMovies) {
             if(movie.getGenres().contains(genres)||genres == null) {
                 if (searchText.isEmpty()) {
@@ -166,22 +164,19 @@ public class HomeController implements Initializable {
                     }
                     else continue;
                 }
-
             }
         }
+
         return filteredObservableMovies;
     }
 
     public void controlResetButton() {
         if (isFiltered.get()) {
-
             resetBtn.setVisible(true);
             resetBtn.setManaged(true);
             resetBtn.setDisable(false);
-
         }
         else {
-
             resetBtn.setVisible(false);
             resetBtn.setManaged(false);
             resetBtn.setDisable(true);
