@@ -230,19 +230,19 @@ public class HomeController implements Initializable {
         Stream<Movie> movieStream = movies.stream();
 
         actorMap = movieStream
-                .flatMap(movie ->  Arrays.stream(movie.getMainCast()))
-                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting()));
+                .flatMap(movie ->  Arrays.stream(movie.getMainCast())) //Actors aus Movie und Maincast array extrahieren
+                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting())); //nach actor gruppieren und vorkommen zählen
 
         maxFeatures = actorMap.values().stream()
-                .max((cntActor1,cntActor2) -> Long.compare(cntActor1,cntActor2))
+                .max((cntActor1,cntActor2) -> Long.compare(cntActor1,cntActor2)) //häufigstes Vorkommen feststellen
                 .orElse((long) (0));
 
         Long finalMaxFeatures = maxFeatures;
         mostCastActor = actorMap.entrySet().stream()
-                .filter(features -> features.getValue() == finalMaxFeatures)
-                .map(entry -> entry.getKey())
+                .filter(features -> features.getValue() == finalMaxFeatures) //filtern auf nur maximales Vorkommen
+                .map(entry -> entry.getKey())// passenden Schlüssel zum höchsten Vorkommen finden
                 .collect(Collectors.toList())
-                .stream().collect(Collectors.joining(", "));
+                .stream().collect(Collectors.joining(", ")); //Liste komma separiert weil Laut angabe String returned werden muss
         System.out.println(mostCastActor);
         return mostCastActor;
     }
