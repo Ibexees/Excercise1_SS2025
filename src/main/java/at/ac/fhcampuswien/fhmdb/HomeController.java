@@ -3,6 +3,7 @@ package at.ac.fhcampuswien.fhmdb;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.MovieComparator;
+import at.ac.fhcampuswien.fhmdb.models.Rating;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -47,7 +48,7 @@ public class HomeController implements Initializable {
     @FXML
     public JFXComboBox ratingComboBox;
     @FXML
-    public JFXComboBox yearComboBox;
+    public TextField yearField;
     private BooleanProperty isFiltered = new SimpleBooleanProperty(false);
 
     private Map<String,String> parameters = new HashMap<>();
@@ -70,8 +71,9 @@ public class HomeController implements Initializable {
 
             genreComboBox.getItems().addAll(Genre.values());
             genreComboBox.setPromptText("Filter by Genre");
-            ratingComboBox.setPromptText("Filter by Rating");
-            yearComboBox.setPromptText("Filter by Year");
+            ratingComboBox.setPromptText("Filter by Rating and Above");
+            ratingComboBox.getItems().addAll(Rating.values());
+
 
         // TODO add event handlers to buttons and call the regarding methods
         // either set event handlers in the fxml file (onAction) or add them here
@@ -123,8 +125,10 @@ public class HomeController implements Initializable {
         resetBtn.setDisable(true);
 
         genreComboBox.setValue(null);
+        ratingComboBox.setValue(null);
         genreComboBox.resetValidation();
         searchField.clear();
+        yearField.clear();
         isFiltered.set(false);
     }
 
@@ -144,17 +148,29 @@ public class HomeController implements Initializable {
 
     private void handleFilter(ActionEvent actionEvent) {
         System.out.println("Filter Button pressed");
-        String searchText = searchField.getText();
-        Genre param = null;
+        String searchText;
+        Genre genre = null;
+        Rating param;
+
+        if(searchField.getText() != null)
+        {
+            searchText = searchField.getText();
+            parameters.put("query",searchText);
+        }
 
         if (genreComboBox.getSelectionModel().getSelectedItem() != null) {
-            param = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
-            parameters.put("genre",param.toString());
+            genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
+            parameters.put("genre",genre.toString());
         }
 
         if (ratingComboBox.getSelectionModel().getSelectedItem() != null) {
-            param = Genre.valueOf(ratingComboBox.getSelectionModel().getSelectedItem().toString());
-            parameters.put("rating",param.toString());
+            param = Rating.valueOf(ratingComboBox.getSelectionModel().getSelectedItem().toString());
+            parameters.put("ratingFrom", Integer.toString(param.getRating()));
+        }
+
+        if(yearField.getText()!=null)
+        {
+            parameters.put("releaseYear",yearField.getText());
         }
 
         //New Filter handled by API
