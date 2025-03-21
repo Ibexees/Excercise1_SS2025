@@ -185,4 +185,15 @@ class HomeControllerTest {
         assertEquals("The Dark Knight", filteredMovies.get(0).getTitle(), "The Dark Knight ist [ACTION] Genre & der gesuchte String ist enthalten.");
         assertEquals("The Dark Knight Rises", filteredMovies.get(1).getTitle(), "The Dark Knight Rises ist [ACTION] Genre & der gesuchte String ist enthalten.");
     }
+
+    @Test
+    public void only_most_popular_Actor_returned()
+    {
+        Movie actor = new Movie("Man","Test",Arrays.asList(Genre.ACTION));
+        actor.setMainCast(new String[]{"Nathan Graves"});
+        System.out.println(Arrays.toString(actor.getMainCast()));
+
+
+
+    }
 }

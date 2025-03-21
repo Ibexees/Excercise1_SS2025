@@ -18,7 +18,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
@@ -42,10 +44,14 @@ public class HomeController implements Initializable {
 
     @FXML
     public JFXButton resetBtn;
-
+    @FXML
+    public JFXComboBox ratingComboBox;
+    @FXML
+    public JFXComboBox yearComboBox;
     private BooleanProperty isFiltered = new SimpleBooleanProperty(false);
 
-    public List<Movie> allMovies = Movie.initializeMovies();
+    private Map<String,String> parameters = new HashMap<>();
+    public List<Movie> allMovies = Movie.initializeMovies(parameters);
 
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
@@ -64,13 +70,13 @@ public class HomeController implements Initializable {
 
             genreComboBox.getItems().addAll(Genre.values());
             genreComboBox.setPromptText("Filter by Genre");
+            ratingComboBox.setPromptText("Filter by Rating");
+            yearComboBox.setPromptText("Filter by Year");
 
         // TODO add event handlers to buttons and call the regarding methods
         // either set event handlers in the fxml file (onAction) or add them here
         searchBtn.setOnAction(this::handleFilter);
-
         resetBtn.setOnAction(this::handleReset);
-
         isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
 
         // Sort button example:
@@ -99,6 +105,12 @@ public class HomeController implements Initializable {
 
 
 
+    }
+
+    public void setAllMovies(ObservableList<Movie> movieList)
+    {
+        allMovies = movieList;
+        observableMovies = movieList;
     }
 
     private void handleReset(ActionEvent actionEvent) {
@@ -133,22 +145,33 @@ public class HomeController implements Initializable {
     private void handleFilter(ActionEvent actionEvent) {
         System.out.println("Filter Button pressed");
         String searchText = searchField.getText();
-        Genre genre = null;
+        Genre param = null;
 
         if (genreComboBox.getSelectionModel().getSelectedItem() != null) {
-            genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
+            param = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
+            parameters.put("genre",param.toString());
         }
 
-        ObservableList<Movie> filteredMovies;
-        filteredMovies = (ObservableList<Movie>) filterMovies(genre, searchText);
-        observableMovies = filteredMovies;
+        if (ratingComboBox.getSelectionModel().getSelectedItem() != null) {
+            param = Genre.valueOf(ratingComboBox.getSelectionModel().getSelectedItem().toString());
+            parameters.put("rating",param.toString());
+        }
 
-        movieListView.setItems( observableMovies);
+        //New Filter handled by API
+        ObservableList<Movie> filteredMoviesByAPI;
+        filteredMoviesByAPI =  FXCollections.observableArrayList(Movie.initializeMovies(parameters));
+        observableMovies = filteredMoviesByAPI;
+
+        //old Logic, now handled by API
+        //ObservableList<Movie> filteredMovies;
+        //filteredMovies = (ObservableList<Movie>) filterMovies(genre, searchText);
+
+        movieListView.setItems(observableMovies);
         movieListView.refresh();
         isFiltered.set(true);
     }
 
-    //TODO: Write Method
+    //Not in use anymore, handled by API
     public List<Movie> filterMovies(Genre genres, String searchText)
     {
         ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();

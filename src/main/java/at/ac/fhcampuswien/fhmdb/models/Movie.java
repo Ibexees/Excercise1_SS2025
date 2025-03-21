@@ -47,26 +47,24 @@ public class Movie {
         return this.genres.toString();
     }
 
-    public static List<Movie> initializeMovies(){
+    public static List<Movie> initializeMovies(Map<String,String> parameters){
         List<Movie> movies = new ArrayList<>();
 
         String apiResponse;
         Map<String, String> emptyParameters = new HashMap<>();
-        //Test Parameters - Funktioniert mit dem Beispiel
-        /*
+        /*Test Parameters - Funktioniert mit dem Beispiel
         Map<String, String> parameters = new HashMap<>();
-
-        parameters.put("genre", "ACTION");
-        */
+        parameters.put("genre", "ACTION");*/
 
         try {
-            apiResponse = MovieAPI.getMovies(emptyParameters);
-            System.out.println(apiResponse);
+            apiResponse = MovieAPI.getMovies(parameters);
+            //System.out.println(apiResponse);
             movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
 
 
         //Stock Movies
@@ -89,6 +87,7 @@ public class Movie {
 
         return movies;
     }
+
 
     @Override
     public String toString()
