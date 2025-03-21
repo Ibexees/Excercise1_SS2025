@@ -19,10 +19,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HomeController implements Initializable {
     @FXML
@@ -221,4 +221,48 @@ public class HomeController implements Initializable {
             resetBtn.setDisable(true);
         }
     }
+
+    String getMostPopularActor(List<Movie> movies)
+    {
+        Map<String,Long> actorMap = new HashMap<>();
+        Long maxFeatures = (long) 0;
+        String mostCastActor = "";
+        Stream<Movie> movieStream = movies.stream();
+
+        actorMap = movieStream
+                .flatMap(movie ->  Arrays.stream(movie.getMainCast()))
+                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting()));
+
+        maxFeatures = actorMap.values().stream()
+                .max((cntActor1,cntActor2) -> Long.compare(cntActor1,cntActor2))
+                .orElse((long) (0));
+
+        Long finalMaxFeatures = maxFeatures;
+        mostCastActor = actorMap.entrySet().stream()
+                .filter(features -> features.getValue() == finalMaxFeatures)
+                .map(entry -> entry.getKey())
+                .collect(Collectors.toList())
+                .stream().collect(Collectors.joining(", "));
+        System.out.println(mostCastActor);
+        return mostCastActor;
+    }
+
+    int getLongestMovieTitle(List<Movie> movies)
+    {
+        int titleCharacterCount = 0;
+        return titleCharacterCount;
+    }
+
+    long countMoviesFrom(List<Movie> movies, String director)
+    {
+        return 0;
+    }
+    List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear)
+    {
+        return new ArrayList<>();
+    }
+
+
+
+
 }

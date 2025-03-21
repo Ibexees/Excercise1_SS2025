@@ -115,63 +115,81 @@ public class Movie {
         return releaseYear;
     }
 
-    public void setReleaseYear(int releaseYear) {
+    public Movie setTitle(String title)
+    {
+        this.title = title;
+        return this;
+    }
+
+    public Movie setReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
+        return this;
     }
 
     public String getImgUrl() {
         return imgUrl;
     }
 
-    public void setImgUrl(String imgUrl) {
+    public Movie setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+        return this;
     }
 
     public int getLengthInMinutes() {
         return lengthInMinutes;
     }
 
-    public void setLengthInMinutes(int lengthInMinutes) {
+    public Movie setLengthInMinutes(int lengthInMinutes) {
         this.lengthInMinutes = lengthInMinutes;
+        return this;
     }
 
     public String[] getMainCast() {
+        if(mainCast == null)
+        {
+            mainCast = new String[0];
+        }
         return mainCast;
     }
 
-    public void setMainCast(String[] mainCast) {
+    public Movie setMainCast(String[] mainCast) {
         this.mainCast = mainCast;
+        return this;
     }
 
     public String[] getDirectors() {
         return directors;
     }
 
-    public void setDirectors(String[] directors) {
+    public Movie setDirectors(String[] directors) {
         this.directors = directors;
+        return this;
     }
 
     public String[] getWriters() {
         return writers;
     }
 
-    public void setWriters(String[] writers) {
+    public Movie setWriters(String[] writers) {
         this.writers = writers;
+        return this;
     }
 
     public double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public Movie setRating(double rating) {
         this.rating = rating;
+        return this;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public Movie setId(String id) {
         this.id = id;
+        return this;
     }
 }

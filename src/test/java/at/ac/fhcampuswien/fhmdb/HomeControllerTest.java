@@ -24,7 +24,7 @@ class HomeControllerTest {
     public void movie_should_have_Attributes()
     {
         //Erwartete Attribute
-        List<String> expectedFields = Arrays.asList("title","description","genres");
+        List<String> expectedFields = Arrays.asList("id","title","description","genres","releaseYear","imgUrl","lengthInMinutes","mainCast","directors","writers","rating");
 
         //Tatsächliche Attribute aus Klasse
         Field[] fields = Movie.class.getDeclaredFields();
@@ -189,11 +189,63 @@ class HomeControllerTest {
     @Test
     public void only_most_popular_Actor_returned()
     {
-        Movie actor = new Movie("Man","Test",Arrays.asList(Genre.ACTION));
-        actor.setMainCast(new String[]{"Nathan Graves"});
-        System.out.println(Arrays.toString(actor.getMainCast()));
+        HomeController homeController = new HomeController();
+        List<Movie> sortedMovies = new ArrayList<>();
+
+        sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setMainCast(new String[]{"Nathan Graves","Alucard"}));
+        sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setMainCast(new String[]{"Soma Cruz","Yoko Belnades"}));
+        sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setMainCast(new String[]{"Jonathan Morris","Charlotte Aulin"}));
 
 
+        String mostCastActor = "Nathan Graves"; //expected
+        String mostCastActorFromMethod; //actual
+        mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
+
+        assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
+
+    }
+
+    @Test
+    public void multiple_most_popular_Actors_returned()
+    {
+        HomeController homeController = new HomeController();
+        List<Movie> sortedMovies = new ArrayList<>();
+
+        sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setMainCast(new String[]{"Nathan Graves","Alucard"}));
+        sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setMainCast(new String[]{"Soma Cruz","Yoko Belnades"}));
+        sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setMainCast(new String[]{"Jonathan Morris","Julius Belmont"}));
+
+
+        String mostCastActor = "Julius Belmont, Nathan Graves"; //expected
+        String mostCastActorFromMethod; //actual
+        mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
+
+        assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
+
+    }
+
+    @Test
+    public void no_Actor_returned()
+    {
+        HomeController homeController = new HomeController();
+        List<Movie> sortedMovies = new ArrayList<>();
+
+        sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
+        sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
+        sortedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)));
+        sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
+        sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
+
+
+        String mostCastActor = ""; //expected
+        String mostCastActorFromMethod; //actual
+        mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
+
+        assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
 
     }
 }
