@@ -187,7 +187,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void only_most_popular_Actor_returned()
+    public void return_only_most_popular_Actor()
     {
         HomeController homeController = new HomeController();
         List<Movie> sortedMovies = new ArrayList<>();
@@ -208,7 +208,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void multiple_most_popular_Actors_returned()
+    public void return_multiple_most_popular_Actors()
     {
         HomeController homeController = new HomeController();
         List<Movie> sortedMovies = new ArrayList<>();
@@ -229,7 +229,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void no_Actor_returned()
+    public void no_most_popular_Actor_returned()
     {
         HomeController homeController = new HomeController();
         List<Movie> sortedMovies = new ArrayList<>();
@@ -246,6 +246,68 @@ class HomeControllerTest {
         mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
 
         assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
+
+    }
+
+    @Test
+    public void only_movies_between_years_returned()
+    {
+        HomeController homeController = new HomeController();
+        List<Movie> movies = new ArrayList<>();
+
+        movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016));
+        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setReleaseYear(2000));
+        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+
+        List<Movie> expectedMovies = new ArrayList<>();
+        expectedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016));
+        expectedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        expectedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        expectedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+
+
+        assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2005,2020),"expected: "+expectedMovies+" actual: "+movies);
+
+    }
+
+    @Test
+    public void no_movies_between_years_returned()
+    {
+        HomeController homeController = new HomeController();
+        List<Movie> movies = new ArrayList<>();
+
+        movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016));
+        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setReleaseYear(2000));
+        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+
+        List<Movie> expectedMovies = new ArrayList<>();
+
+        assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2020,2020),"expected: "+expectedMovies+" actual: "+movies);
+
+    }
+
+    @Test
+    public void no_movies_release_year_set()
+    {
+        HomeController homeController = new HomeController();
+        List<Movie> movies = new ArrayList<>();
+
+        movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
+        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
+        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+
+        List<Movie> expectedMovies = new ArrayList<>();
+        expectedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        expectedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        expectedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+
+        assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2005,2019),"expected: "+expectedMovies+" actual: "+movies);
 
     }
 }
