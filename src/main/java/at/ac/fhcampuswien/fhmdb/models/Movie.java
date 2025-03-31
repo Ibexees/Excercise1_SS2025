@@ -54,8 +54,6 @@ public class Movie {
         Map<String, String> emptyParameters = new HashMap<>();
         //Test Parameters - Funktioniert mit dem Beispiel
 
-
-
         try {
             apiResponse = MovieAPI.getMovies(parameters);
             //System.out.println(apiResponse);

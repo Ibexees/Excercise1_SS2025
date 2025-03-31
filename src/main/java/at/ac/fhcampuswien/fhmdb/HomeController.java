@@ -117,6 +117,7 @@ public class HomeController implements Initializable {
 
     private void handleReset(ActionEvent actionEvent) {
         observableMovies.clear();
+        allMovies = FXCollections.observableArrayList(Movie.initializeMovies(null));
         observableMovies.addAll(allMovies);
         movieListView.setItems(observableMovies);
 
