@@ -64,7 +64,8 @@ public class MovieCell extends ListCell<Movie> {
 
             // layout
             title.fontProperty().set(title.getFont().font(20));
-            detail.setMaxWidth(this.getScene().getWidth() - 30);
+            if(getScene()!= null)
+            {detail.setMaxWidth(this.getScene().getWidth() - 30);}
             detail.setWrapText(true);
             layout.setPadding(new Insets(10));
             layout.spacingProperty().set(10);
