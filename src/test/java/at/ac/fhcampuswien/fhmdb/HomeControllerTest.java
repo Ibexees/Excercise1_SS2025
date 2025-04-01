@@ -316,7 +316,7 @@ class HomeControllerTest {
     @Test
     public void getLongestMovieTitle(){
         HomeController homeController = new HomeController();
-        List<Movie> moviesLong = new ArrayList<>();
+        List<Movie> movies = new ArrayList<>();
         movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
         movies.add(new Movie("Into the Spiderverse","interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.ACTION)));
