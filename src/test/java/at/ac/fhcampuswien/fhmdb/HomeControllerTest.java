@@ -322,6 +322,6 @@ class HomeControllerTest {
         movies.add(new Movie("Into the Spiderverse","interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.ACTION)));
 
         int longestTitleLength = homeController.getLongestMovieTitle(movies);
-        assertEquals(21,longestTitleLength, "longest title has 21 characters");
+        assertEquals(20,longestTitleLength, "longest title has 20 characters");
     }
 }
