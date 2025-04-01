@@ -87,8 +87,8 @@ class HomeControllerTest {
 
     @Test //Nancy
     public void title_filter_not_case_sensitive() {
-        HomeController homeController = new HomeController();
-        homeController.allMovies = Arrays.asList(
+        HomeController homeController = new HomeController(); //homecontroller instanz erzeugen, für filterung von filmen
+        homeController.allMovies = Arrays.asList( // testfilme mit 2 versionen
                     new Movie("The Dark Knight","Action movie",Arrays.asList(Genre.ACTION)),
                     new Movie("the dark knight","The battle between batman and joker",Arrays.asList(Genre.ACTION)),
                     new Movie("willy wonka and the chocolate factory","Fantasy movie",Arrays.asList(Genre.FANTASY)),
@@ -99,14 +99,14 @@ class HomeControllerTest {
                     new Movie("SUPERBAD","Comedy Movie",Arrays.asList(Genre.COMEDY))
             );
 
-            // suche nach the dark knight
+            // suche nach the dark knight, simuliert benutzereingabe
         String searchQuery ="the dark knight";
-        List<Movie> resultDarkKnight =homeController.filterMovies(null,"the dark knight");
+        List<Movie> resultDarkKnight =homeController.filterMovies(null,"the dark knight"); // methode filterMovies aufgerufen, genre auf null, suchtext,
 
 
         //erwartete Anzahl an Treffern
         assertEquals(2, resultDarkKnight.size());
-        assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("The Dark Knight"))); //braucht man diese Zeile Robuster aber Logik ?
+        assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("The Dark Knight"))); //überflüssig? weil in der ersten Zeile werden schon 2 filme ausgespuckt
         assertFalse(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("Superbad"))); //braucht man diese Zeile Robuster aber Logik ?
 
 
@@ -309,5 +309,17 @@ class HomeControllerTest {
 
         assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2005,2019),"expected: "+expectedMovies+" actual: "+movies);
 
+    }
+
+    @Test
+    public void getLongestMovieTitle(List<Movie> movies){
+        HomeController homeController = new HomeController();
+        List<Movie> moviesLong = new ArrayList<>();
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
+        movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
+        movies.add(new Movie("Into the Spiderverse","interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.ACTION)));
+
+        int longestTitleLength = homeController.getLongestMovieTitle(movies);
+        assertEquals(21,longestTitleLength, "longest title has 21 characters");
     }
 }

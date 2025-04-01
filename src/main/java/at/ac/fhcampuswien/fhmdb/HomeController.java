@@ -248,11 +248,16 @@ public class HomeController implements Initializable {
         return mostCastActor;
     }
 
-    int getLongestMovieTitle(List<Movie> movies)
-    {
-        int titleCharacterCount = 0;
-        return titleCharacterCount;
+    int getLongestMovieTitle(List<Movie> movies) {
+        return movies.stream()
+                .map(movie -> movie.getTitle())
+                .mapToInt(String::length)
+                .max()
+                .orElse(0);
     }
+
+
+
 
     long countMoviesFrom(List<Movie> movies, String director)
     {
