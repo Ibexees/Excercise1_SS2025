@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class HomeControllerTest {
 
 
+    private List<Movie> movies;
+
     //Muss auf die neuen Attribute (releaseYear etc.) erweitert werden.
     @Test
     public void movie_should_have_Attributes()
@@ -312,7 +314,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void getLongestMovieTitle(List<Movie> movies){
+    public void getLongestMovieTitle(){
         HomeController homeController = new HomeController();
         List<Movie> moviesLong = new ArrayList<>();
         movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));

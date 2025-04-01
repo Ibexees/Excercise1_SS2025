@@ -250,7 +250,7 @@ public class HomeController implements Initializable {
 
     int getLongestMovieTitle(List<Movie> movies) {
         return movies.stream()
-                .map(movie -> movie.getTitle())
+                .map(Movie::getTitle)
                 .mapToInt(String::length)
                 .max()
                 .orElse(0);
