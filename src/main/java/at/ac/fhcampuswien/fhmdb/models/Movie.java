@@ -21,6 +21,7 @@ public class Movie {
     private String[] writers;
     private double rating;
 
+
     // TODO add more properties here
 
     public Movie(String title, String description,List<Genre> genres) {
@@ -47,6 +48,7 @@ public class Movie {
         return this.genres.toString();
     }
 
+
     public static List<Movie> initializeMovies(Map<String,String> parameters){
         List<Movie> movies = new ArrayList<>();
 
@@ -62,6 +64,10 @@ public class Movie {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        
+
+
 
 
 
