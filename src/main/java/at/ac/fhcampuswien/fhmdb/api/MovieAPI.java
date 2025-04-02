@@ -10,6 +10,12 @@ import java.util.Scanner;
 
 public class MovieAPI {
 
+    /**
+     * what the method is actually doing
+     * @param params what parameter are we giving
+     * @return what is the method returning
+     * @throws IOException what kind of exception is thrown from the method
+     */
     public static String getMovies(Map<String, String> params) throws IOException {
         StringBuilder response = new StringBuilder();
         String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
