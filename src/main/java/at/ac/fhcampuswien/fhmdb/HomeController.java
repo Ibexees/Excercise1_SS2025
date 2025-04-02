@@ -20,7 +20,6 @@ import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -261,7 +260,10 @@ public class HomeController implements Initializable {
 
     long countMoviesFrom(List<Movie> movies, String director)
     {
-        return 0;
+        return movies.stream()
+                .filter(movie -> movie.getDirectors() != null &&
+                        Arrays.asList(movie.getDirectors()).contains(director))
+                .count();
     }
 
     List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear)

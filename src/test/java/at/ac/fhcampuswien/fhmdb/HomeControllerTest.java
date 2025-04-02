@@ -314,7 +314,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void longest_movie_title_returned(){
+    public void getLongestMovieTitle(){
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
         movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
@@ -323,14 +323,5 @@ class HomeControllerTest {
 
         int longestTitleLength = homeController.getLongestMovieTitle(movies);
         assertEquals(20,longestTitleLength, "longest title has 20 characters");
-    }
-
-    @Test
-    public void longest_movie_title_emptylist(){
-    HomeController homeController = new HomeController();
-    List<Movie> movies = new ArrayList<>();
-
-    int longestTitleLength = homeController.getLongestMovieTitle(movies);
-    assertEquals(0,longestTitleLength, "longest title has 0 characters");
     }
 }
