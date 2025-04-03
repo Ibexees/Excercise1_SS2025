@@ -1,9 +1,11 @@
 package at.ac.fhcampuswien.fhmdb;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
+import at.ac.fhcampuswien.fhmdb.models.Rating;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -88,8 +90,6 @@ public class HomeControllerFXTest extends ApplicationTest
     @Test
     void testDescSortButtonUpdatesListView() {
 
-        //Testmöglichkeit für alle Filme in initializeMovies benötigt aber Schleife in Testcase!
-        //List<Movie> movies = new ArrayList<>();
         ObservableList movies;
         movies = FXCollections.observableArrayList();
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
@@ -117,6 +117,50 @@ public class HomeControllerFXTest extends ApplicationTest
         assertEquals("Your Name", DisplayedMovies.get(0).getTitle());
 
 
+    }
+
+   @Test
+    public void parameters_reset_correctly()
+    {
+        robot.clickOn("#searchField").write("Shaw");
+        robot.clickOn("#genreComboBox").clickOn("DRAMA");
+        robot.clickOn("#yearField").write("1994");
+        robot.clickOn("#ratingComboBox").clickOn("EIGHT");
+
+        robot.clickOn("#searchBtn");
+        robot.clickOn("#resetBtn");
+
+        assertEquals("", homeController.searchField.getText());
+        assertEquals(null, homeController.genreComboBox.getSelectionModel().getSelectedItem());
+        assertEquals("", homeController.yearField.getText(), "expected: null, actual:" + homeController.yearField.getText());
+        assertEquals(null, homeController.ratingComboBox.getSelectionModel().getSelectedItem());
+    }
+
+    @Test
+    public  void filters_set_correctly()
+    {
+
+        robot.clickOn("#searchField").write("Shaw");
+        robot.clickOn("#genreComboBox").clickOn("DRAMA");
+        robot.clickOn("#yearField").write("1994");
+        robot.clickOn("#ratingComboBox").clickOn("EIGHT");
+
+        robot.clickOn("#searchBtn");
+        robot.clickOn("#resetBtn");
+
+        robot.clickOn("#searchField").write("godfather");
+        robot.clickOn("#genreComboBox").clickOn("DRAMA");
+        robot.clickOn("#yearField").write("1972");
+        robot.clickOn("#ratingComboBox").clickOn("EIGHT");
+
+        robot.clickOn("#searchBtn");
+
+        // Zugriff auf die ListView
+        ListView<Movie> listView = robot.lookup("#movieListView").queryAs(ListView.class);
+        ObservableList<Movie> DisplayedMovies = listView.getItems();
+
+        // Prüfen, ob die Reihenfolge korrekt ist
+        assertEquals("The Godfather", DisplayedMovies.get(0).getTitle());
     }
 }
 
