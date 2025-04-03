@@ -73,9 +73,6 @@ public class HomeController implements Initializable {
             ratingComboBox.setPromptText("Filter by Rating and Above");
             ratingComboBox.getItems().addAll(Rating.values());
 
-
-        // TODO add event handlers to buttons and call the regarding methods
-        // either set event handlers in the fxml file (onAction) or add them here
         searchBtn.setOnAction(this::handleFilter);
         resetBtn.setOnAction(this::handleReset);
         isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
@@ -114,6 +111,7 @@ public class HomeController implements Initializable {
         observableMovies = movieList;
     }
 
+    /**Resets all Parameters and fetches all movies from the API*/
     private void handleReset(ActionEvent actionEvent) {
         observableMovies.clear();
         allMovies = FXCollections.observableArrayList(Movie.initializeMovies(null));
@@ -146,6 +144,7 @@ public class HomeController implements Initializable {
 
     }
 
+    /**handles set Parameters and Filters movie List accordingly*/
     private void handleFilter(ActionEvent actionEvent) {
         System.out.println("Filter Button pressed");
         String searchText;

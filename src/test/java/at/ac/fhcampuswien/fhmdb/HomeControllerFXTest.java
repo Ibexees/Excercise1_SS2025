@@ -90,8 +90,6 @@ public class HomeControllerFXTest extends ApplicationTest
     @Test
     void testDescSortButtonUpdatesListView() {
 
-        //Testmöglichkeit für alle Filme in initializeMovies benötigt aber Schleife in Testcase!
-        //List<Movie> movies = new ArrayList<>();
         ObservableList movies;
         movies = FXCollections.observableArrayList();
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
