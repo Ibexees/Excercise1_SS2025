@@ -27,7 +27,7 @@ public class MovieCell extends ListCell<Movie> {
 
     private final VBox textLayout = new VBox(title, detail, genres, releaseYear, rating, lengthInMinutes, mainCast, directors, writers);
     private final ImageView posterView = new ImageView();
-    private final HBox layout = new HBox(posterView, textLayout); // HBox for side-by-side layout
+    private final HBox layout = new HBox(posterView, textLayout);
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
@@ -51,16 +51,17 @@ public class MovieCell extends ListCell<Movie> {
 
             // Load image
             if (movie.getImgUrl() != null && !movie.getImgUrl().isEmpty()) {
-                Image posterImage = new Image(movie.getImgUrl(), true); // Load image lazily
+                Image posterImage = new Image(movie.getImgUrl(), true);
                 posterView.setImage(posterImage);
-                posterView.setFitWidth(100);  // Set image width
-                posterView.setFitHeight(150); // Set image height
+                posterView.setFitWidth(100);
+                posterView.setFitHeight(150);
                 posterView.setPreserveRatio(true);
             } else {
                 posterView.setImage(null);
+                posterView.setFitWidth(100);
+                posterView.setFitHeight(150);
             }
 
-            // Styling
             title.getStyleClass().add("text-yellow");
             detail.getStyleClass().add("text-white");
             genres.getStyleClass().add("text-white");
@@ -84,4 +85,5 @@ public class MovieCell extends ListCell<Movie> {
         }
     }
 }
+
 
