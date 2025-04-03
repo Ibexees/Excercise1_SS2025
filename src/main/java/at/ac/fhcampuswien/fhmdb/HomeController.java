@@ -223,6 +223,13 @@ public class HomeController implements Initializable {
         }
     }
 
+    /**
+     * This method identifies the actor(s) who appear in the most movies from a given list, and returns their name(s) as a comma-separated String
+     * Its purpose is to find the actor(s) who are most frequently featured across the provided list of Movie objects and return their name(s) as a comma-separated String
+     * Key concept used is "Stream", which processes list cleanly instead of loops
+     * @param movies (list of movie objects to analyse)
+     * @return String (names of the actor(s) with the most appearance
+     */
     String getMostPopularActor(List<Movie> movies)
     {
         Map<String,Long> actorMap = new HashMap<>();
@@ -248,6 +255,16 @@ public class HomeController implements Initializable {
         return mostCastActor;
     }
 
+    /**
+     * This method finds the length of the longest movie title from a given list of Movie objects
+     * Key concept used is "Stream", for processing the list cleanly
+     * map() is used to extract movie titles
+     * mapToInt() is used to convert strings to their lengths
+     * max() is used to find the longest length
+     * orElse(0) is used to handle the case where the list is empty
+     * @param movies (list of movie objects to examine)
+     * @return int (length of longest title)
+     */
     int getLongestMovieTitle(List<Movie> movies) {
         return movies.stream()
                 .map(Movie::getTitle)
@@ -257,8 +274,17 @@ public class HomeController implements Initializable {
     }
 
 
-
-
+    /**
+     * This method counts how many movies in the provided list were directed by a specific director
+     * Key concept used is "Stream", for processing the list cleanly
+     * filter() is used to only keep the movies that match the director
+     * Arrays.asList() converts array of directors to a list for searching
+     * contains() checks if the director is listed
+     * count() returns the number of matching elements
+     * @param movies (list of movie objects to examine)
+     * @param director (the director's name to search for)
+     * @return long (number of movies directed by the given name)
+     */
     long countMoviesFrom(List<Movie> movies, String director)
     {
         return movies.stream()
@@ -267,6 +293,16 @@ public class HomeController implements Initializable {
                 .count();
     }
 
+    /**
+     * This method is used to return a list of movies that were released between two given years
+     * Key concept used is "Stream", for processing the list cleanly
+     * filter() to select only movies within the year range
+     * toList() converts the result back to a list
+     * @param movies (full list of movie objects to filter)
+     * @param startYear (the earliest release year to include)
+     * @param endYear (the latest release year to include)
+     * @return List (filtered list of movies released in the specific range)
+     */
     List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear)
     {
 

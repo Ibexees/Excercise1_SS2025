@@ -11,10 +11,11 @@ import java.util.Scanner;
 public class MovieAPI {
 
     /**
-     * what the method is actually doing
-     * @param params what parameter are we giving
-     * @return what is the method returning
-     * @throws IOException what kind of exception is thrown from the method
+     * This class contains methods to interact with the online movie API, specifically to send HTTP GET requests and receive movie data as a JSON response
+     * Its Purpose is to build a URL with query parameters, send the HTTP GET request to the movie API, and return the JSON response as a String
+     * @param params (key value pair map, used to add the query parameters to the URL)
+     * @return String
+     * @throws IOException (might throw one if the HTTP request fails or occurrence of connectivity problems
      */
     public static String getMovies(Map<String, String> params) throws IOException {
         StringBuilder response = new StringBuilder();
