@@ -124,9 +124,9 @@ public class HomeController implements Initializable {
         resetBtn.setManaged(false);
         resetBtn.setDisable(true);
 
-        genreComboBox.setValue(null);
-        ratingComboBox.setValue(null);
-        genreComboBox.resetValidation();
+        genreComboBox.getSelectionModel().clearSelection();
+        ratingComboBox.getSelectionModel().clearSelection();
+        genreComboBox.getSelectionModel().clearSelection();
         searchField.clear();
         yearField.clear();
         isFiltered.set(false);
@@ -151,6 +151,7 @@ public class HomeController implements Initializable {
         String searchText;
         Genre genre = null;
         Rating param;
+        parameters = new HashMap<>();
 
         if(searchField.getText() != null)
         {
