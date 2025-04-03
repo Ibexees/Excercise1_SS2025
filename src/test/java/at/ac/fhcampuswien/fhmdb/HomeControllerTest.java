@@ -333,4 +333,72 @@ class HomeControllerTest {
         int longestTitleLength = homeController.getLongestMovieTitle(movies);
         assertEquals(0,longestTitleLength, "longest title has 0 characters");
     }
+
+    @Test
+    public void test_CountMoviesFrom_givenDirector_returnCorrectCount() { //for a particular director
+        HomeController homeController = new HomeController();
+        List<Movie> movies = new ArrayList<>();
+
+        movies.add(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
+        movies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+        movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+        movies.add(new Movie("Into the Spiderverse", "interdimesional spider people", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+
+        //set directors
+        movies.get(0).setDirectors(new String[]{"Makato Shinkai"});
+        movies.get(1).setDirectors(new String[]{"Antoine Fuqua"});
+        movies.get(2).setDirectors(new String[]{"Martin Scorsese"});
+        movies.get(3).setDirectors(new String[]{"Mark Osborne"});
+        movies.get(4).setDirectors(new String[]{"Bob Persichetti"});
+
+
+        long expected = 1;
+        long actual = homeController.countMoviesFrom(movies, "Makato Shinkai");
+
+        assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+    }
+
+    @Test
+    public void test_CountMoviesFrom_wrongDirector_returnCorrectCount() { //for wrong director
+        HomeController homeController = new HomeController();
+        List<Movie> movies = new ArrayList<>();
+
+        movies.add(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
+        movies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+        movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+        movies.add(new Movie("Into the Spiderverse", "interdimesional spider people", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+
+        //set directors
+        movies.get(0).setDirectors(new String[]{"Makato Shinkai"});
+        movies.get(1).setDirectors(new String[]{"Antoine Fuqua"});
+        movies.get(2).setDirectors(new String[]{"Martin Scorsese"});
+        movies.get(3).setDirectors(new String[]{"Mark Osborne"});
+        movies.get(4).setDirectors(new String[]{"Bob Persichetti"});
+
+        long expected = 0;
+        long actual = homeController.countMoviesFrom(movies, "Denzel Washington");
+
+        assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+    }
+
+    @Test
+    public void test_CountMoviesFrom_noDirector_returnCorrectCount() { // no director at all
+        HomeController homeController = new HomeController();
+        List<Movie> movies = new ArrayList<>();
+
+        movies.add(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
+        movies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+        movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+        movies.add(new Movie("Into the Spiderverse", "interdimesional spider people", Arrays.asList(Genre.ACTION, Genre.ACTION)));
+
+        long expected = 0;
+        long actual = homeController.countMoviesFrom(movies, "Mark Osborne");
+
+        assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+    }
 }
+
+
