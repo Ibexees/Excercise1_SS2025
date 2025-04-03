@@ -44,11 +44,12 @@ public class MovieAPI {
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty("Accept", "application/json");
+        //connection.setRequestProperty("Accept", "application/json");
+        connection.setRequestProperty("User-Agent", "http.agent");
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            //System.out.println("HTTP Request succeeded: " + responseCode);
+            System.out.println("HTTP Request succeeded: " + responseCode);
         }
         else {
             throw new IOException("HTTP Request failed with Errorcode: " + responseCode);

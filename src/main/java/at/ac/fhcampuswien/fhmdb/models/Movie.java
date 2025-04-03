@@ -58,18 +58,12 @@ public class Movie {
 
         try {
             apiResponse = MovieAPI.getMovies(parameters);
-            //System.out.println(apiResponse);
+            System.out.println(apiResponse);
             movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        
-
-
-
-
 
         //Stock Movies
         /*

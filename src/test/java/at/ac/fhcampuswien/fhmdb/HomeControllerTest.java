@@ -1,4 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
+import at.ac.fhcampuswien.fhmdb.api.Deserializer;
+import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import javafx.collections.ObservableList;
@@ -398,6 +400,38 @@ class HomeControllerTest {
         long actual = homeController.countMoviesFrom(movies, "Mark Osborne");
 
         assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+    }
+
+    @Test
+    public void testDeserializerWithOneSampleResponse() {
+        String apiResponseJson = "[{ \"id\": \"81d317b0-29e5-4846-97a6-43c07f3edf4a\", " +
+                "\"title\": \"The Godfather\", " +
+                "\"genres\": [\"DRAMA\"], " +
+                "\"releaseYear\": 1972, " +
+                "\"description\": \"The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.\", " +
+                "\"imgUrl\": \"https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg\", " +
+                "\"lengthInMinutes\": 175, " +
+                "\"directors\": [\"Francis Ford Coppola\"], " +
+                "\"writers\": [\"Mario Puzo\", \"Francis Ford Coppola\"], " +
+                "\"mainCast\": [\"Marlon Brando\", \"Al Pacino\", \"James Caan\"], " +
+                "\"rating\": 9.2 }]";
+
+        List<Movie> movieList = Deserializer.deserializeJsonToMovieModel(apiResponseJson);
+
+        assertNotNull(movieList, "Movies list should not be null");
+        assertEquals(1, movieList.size(), "List should contain exactly one movie");
+        Movie movie = movieList.get(0); // Get the first movie in the list
+        assertEquals("81d317b0-29e5-4846-97a6-43c07f3edf4a", movie.getId(), "ID should match");
+        assertEquals("The Godfather", movie.getTitle(), "Title should match");
+        assertTrue(movie.getGenres().contains(Genre.DRAMA), "Genres should contain DRAMA");
+        assertEquals(1972, movie.getReleaseYear(), "Release year should match");
+        assertEquals("The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.", movie.getDescription(), "Description should match");
+        assertEquals("https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg", movie.getImgUrl(), "Img URL should match");
+        assertEquals(175, movie.getLengthInMinutes(), "Length in minutes should match");
+        assertTrue(Arrays.asList(movie.getDirectors()).contains("Francis Ford Coppola"), "Directors array should contain Francis Ford Coppola");
+        assertTrue(Arrays.asList(movie.getWriters()).contains("Mario Puzo"), "Writers array should contain Mario Puzo");
+        assertTrue(Arrays.asList(movie.getMainCast()).contains("Al Pacino"), "Main cast array should contain Al Pacino");
+        assertEquals(9.2, movie.getRating(), "Rating should match");
     }
 }
 
