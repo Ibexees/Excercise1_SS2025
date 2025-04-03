@@ -38,7 +38,7 @@ public class MovieAPI {
                     .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
                     .forEach(param -> urlBuilder.append(param).append("&"));
             urlBuilder.deleteCharAt(urlBuilder.length() - 1);
-            System.out.println(urlBuilder);
+            //System.out.println(urlBuilder);
         }
 
         URL url = new URL(urlBuilder.toString());
@@ -49,7 +49,7 @@ public class MovieAPI {
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            System.out.println("HTTP Request succeeded: " + responseCode);
+            //System.out.println("HTTP Request succeeded: " + responseCode);
         }
         else {
             throw new IOException("HTTP Request failed with Errorcode: " + responseCode);

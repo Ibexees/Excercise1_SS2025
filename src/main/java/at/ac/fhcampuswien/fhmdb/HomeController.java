@@ -244,7 +244,7 @@ public class HomeController implements Initializable {
                 .map(entry -> entry.getKey())// passenden Schlüssel zum höchsten Vorkommen finden
                 .collect(Collectors.toList())
                 .stream().collect(Collectors.joining(", ")); //Liste komma separiert weil Laut angabe String returned werden muss
-        System.out.println(mostCastActor);
+        //System.out.println(mostCastActor);
         return mostCastActor;
     }
 

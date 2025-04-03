@@ -3,7 +3,9 @@ import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
+import at.ac.fhcampuswien.fhmdb.models.Rating;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.ListView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -433,6 +435,7 @@ class HomeControllerTest {
         assertTrue(Arrays.asList(movie.getMainCast()).contains("Al Pacino"), "Main cast array should contain Al Pacino");
         assertEquals(9.2, movie.getRating(), "Rating should match");
     }
+
 }
 
 
