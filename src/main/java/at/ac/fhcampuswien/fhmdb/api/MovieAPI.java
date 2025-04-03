@@ -22,7 +22,7 @@ public class MovieAPI {
         String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
         StringBuilder urlBuilder = new StringBuilder(apiUrl);
 
-        //Biuld URL with parameters
+        //Build URL with parameters
         if (params != null && !params.isEmpty()) {
             urlBuilder.append("?");
             /*

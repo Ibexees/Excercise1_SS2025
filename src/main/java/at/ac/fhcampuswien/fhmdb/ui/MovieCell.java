@@ -55,7 +55,7 @@ public class MovieCell extends ListCell<Movie> {
                 posterView.setImage(posterImage);
                 posterView.setFitWidth(100);
                 posterView.setFitHeight(150);
-                posterView.setPreserveRatio(true);
+                //posterView.setPreserveRatio(true);
             } else {
                 posterView.setImage(null);
                 posterView.setFitWidth(100);
