@@ -27,6 +27,19 @@
          <Label styleClass="text-white" stylesheets="@styles.css" text="Welcome to FHMDb!" />
       </children>
    </HBox>
+
+
+      <HBox fx:id="bannerHbox" spacing="5.0" styleClass="background-black" stylesheets="@styles.css">
+           <children>
+              <JFXButton fx:id="homeBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Home" />
+              <JFXButton fx:id="watchlistBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Watchlist" />
+              <JFXButton fx:id="aboutBtn" styleClass="background-yellow" stylesheets="@styles.css" text="About" />
+           </children>
+         <padding>
+            <Insets bottom="20.0" left="10.0" top="20.0" />
+         </padding>
+      </HBox>
+
    <HBox fx:id="upperHbox" spacing="5.0" styleClass="background-black" stylesheets="@styles.css">
       <children>
          <JFXButton fx:id="sortBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Sort (asc)" />

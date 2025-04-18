@@ -5,6 +5,7 @@ import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.MovieComparator;
 import at.ac.fhcampuswien.fhmdb.models.Rating;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
+import at.ac.fhcampuswien.fhmdb.ui.MovieCellActionHandler;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -23,7 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class HomeController implements Initializable {
+public class HomeController implements Initializable, MovieCellActionHandler
+{
     @FXML
     public JFXButton searchBtn;
 
@@ -48,11 +50,19 @@ public class HomeController implements Initializable {
     public JFXComboBox ratingComboBox;
     @FXML
     public TextField yearField;
+    @FXML
+    public JFXButton homeBtn;
+    @FXML
+    public JFXButton watchlistBtn;
+    @FXML
+    public JFXButton aboutBtn;
+
+    public static boolean buttonsVisible = true;
     private BooleanProperty isFiltered = new SimpleBooleanProperty(false);
 
     private Map<String,String> parameters = new HashMap<>();
     public List<Movie> allMovies = Movie.initializeMovies(parameters);
-
+    public ObservableList<Movie> watchListMovies = FXCollections.observableArrayList();
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
     private boolean asc;
@@ -66,7 +76,7 @@ public class HomeController implements Initializable {
 
             // initialize UI stuff
             movieListView.setItems(observableMovies);   // set data of observable list to list view
-            movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
+            movieListView.setCellFactory(movieListView -> new MovieCell(this)); // use custom cell factory to display data //erweitert um this Parameter um einen Referenz auf Homecontroller als "Eventhandler" an MovieCell zu Übergeben
 
             genreComboBox.getItems().addAll(Genre.values());
             genreComboBox.setPromptText("Filter by Genre");
@@ -75,6 +85,10 @@ public class HomeController implements Initializable {
 
         searchBtn.setOnAction(this::handleFilter);
         resetBtn.setOnAction(this::handleReset);
+
+        homeBtn.setOnAction(this::handleReset);
+        watchlistBtn.setOnAction(this::displayWatchList);
+
         isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
 
         // Sort button example:
@@ -98,12 +112,21 @@ public class HomeController implements Initializable {
                 sortBtn.setText("Sort (asc)");
             }
             movieListView.setItems( observableMovies);   // set data of observable list to list view
-            movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
+            movieListView.setCellFactory(movieListView -> new MovieCell(this)); // use custom cell factory to display data
         });
 
 
 
     }
+
+    private void displayWatchList(ActionEvent event)
+    {
+        buttonsVisible = false;
+        movieListView.setItems(watchListMovies);
+
+
+    }
+
 
     public void setAllMovies(ObservableList<Movie> movieList)
     {
@@ -113,6 +136,7 @@ public class HomeController implements Initializable {
 
     /**Resets all Parameters and fetches all movies from the API*/
     private void handleReset(ActionEvent actionEvent) {
+        buttonsVisible = true;
         observableMovies.clear();
         allMovies = FXCollections.observableArrayList(Movie.initializeMovies(null));
         observableMovies.addAll(allMovies);
@@ -314,7 +338,45 @@ public class HomeController implements Initializable {
         return movies;
     }
 
+    @Override
+    public void onAddWatchlistClicked(Movie movie)
+    {
+        boolean movieInList = watchListMovies.stream().
+                anyMatch(contain -> contain.equals(movie));
 
+        if(!movieInList)
+        {
+            watchListMovies.add(movie);
+            System.out.println("Movie added to Watchlist");
+        }
+        else
+        {
+            System.out.println("Movie already in Watchlist");
+        }
 
+    }
 
+    @Override
+    public void onShowDetailsClicked(Movie movie)
+    {
+        System.out.println("showDetailsClicked");
+    }
+
+    @Override
+    public void onRemoveWatchlistClicked(Movie movie)
+    {
+
+        boolean movieInList = watchListMovies.stream().
+                anyMatch(contain -> contain.equals(movie));
+
+        if(movieInList)
+        {
+            watchListMovies.remove(movie);
+            System.out.println("Movie removed from Watchlist");
+        }
+        else
+        {
+            System.out.println("Movie does not exist");
+        }
+    }
 }
