@@ -1,6 +1,8 @@
 package at.ac.fhcampuswien.fhmdb;
 import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.dataLayer.DatabaseManager;
+import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.Rating;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -434,6 +437,28 @@ class HomeControllerTest {
         assertTrue(Arrays.asList(movie.getWriters()).contains("Mario Puzo"), "Writers array should contain Mario Puzo");
         assertTrue(Arrays.asList(movie.getMainCast()).contains("Al Pacino"), "Main cast array should contain Al Pacino");
         assertEquals(9.2, movie.getRating(), "Rating should match");
+    }
+
+    @Test
+    public void genreListToString()
+    {
+        ArrayList<Genre> list = new ArrayList<>();
+        list.add(Genre.ACTION);
+        list.add(Genre.ROMANCE);
+        MovieEntity movieEntity = new MovieEntity("ID","title","desc",list,10,null,9,5);
+        assertEquals("ACTION, ROMANCE",movieEntity.getGenres());
+    }
+
+    @Test
+    public void testDatabase()
+    {
+        try
+        {
+            DatabaseManager.getDatabase().testDB();
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 }

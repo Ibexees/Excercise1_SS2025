@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.MovieComparator;
@@ -20,6 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,10 +67,25 @@ public class HomeController implements Initializable, MovieCellActionHandler
     public ObservableList<Movie> watchListMovies = FXCollections.observableArrayList();
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
+    private MovieRepository repository = new MovieRepository();
+
+
     private boolean asc;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //TODO: replace with real read, write DB logic
+        try
+        {
+            repository.removeAll();
+            repository.addAllMovies(allMovies);
+            allMovies = repository.getAllMovies();
+            allMovies.clear();
+            allMovies.add(repository.getMovie("Inception"));
+        } catch (SQLException e)
+        {
+            throw new RuntimeException(e);//TODO: GUI Exception Handling!
+        }
 
         resetBtn.setDisable(true);
             resetBtn.setVisible(false);

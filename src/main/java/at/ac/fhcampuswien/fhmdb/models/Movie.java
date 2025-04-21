@@ -2,12 +2,14 @@ package at.ac.fhcampuswien.fhmdb.models;
 
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.api.Deserializer;
+import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
 import java.util.*;
 
 public class Movie {
+    private long databaseID;
     private String id;
     private String title;
     private String description;
@@ -28,6 +30,19 @@ public class Movie {
         this.title = title;
         this.description = description;
         this.genres = genres;
+    }
+
+    public Movie(MovieEntity movieEntity)
+    {
+        this.databaseID = movieEntity.getId();
+        this.id = movieEntity.getApiId();
+        this.title = movieEntity.getTitle();
+        this.description = movieEntity.getDescription();
+        this.releaseYear = movieEntity.getReleaseYear();
+        this.genres = movieEntity.stringToGenres(movieEntity.getGenres());
+        this.imgUrl = movieEntity.getImgUrl();
+        this.lengthInMinutes = movieEntity.getLengthInMinutes();
+        this.rating = movieEntity.getRating();
     }
 
     public String getTitle() {
