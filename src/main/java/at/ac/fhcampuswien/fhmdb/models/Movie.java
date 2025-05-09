@@ -114,7 +114,11 @@ public class Movie {
         if(obj instanceof  Movie)
         {
             Movie movie = (Movie) obj;
-            if (this.title.equals(movie.title))
+            if (this.getId().equals(movie.getId()))
+            {
+                return true;
+            }
+            else if (this.title.equals(movie.title))
             {
                 return true;
             }
@@ -122,6 +126,12 @@ public class Movie {
         return false;
 
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
 
     public int getReleaseYear() {
         return releaseYear;

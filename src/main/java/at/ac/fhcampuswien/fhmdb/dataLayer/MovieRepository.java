@@ -13,7 +13,7 @@ public class MovieRepository
 
     public MovieRepository()
     {
-        this.dao = DatabaseManager.getDatabase().getDao();
+        this.dao = DatabaseManager.getDatabase().getDynamicDao(MovieEntity.class);
     }
 
     public void addAllMovies(List<Movie> movies) throws SQLException
@@ -25,11 +25,21 @@ public class MovieRepository
         }
     }
 
-    public Movie getMovie(String name) throws SQLException //get by ID oder Name ?
+    /*public Movie getMovie(String name) throws SQLException //get by ID oder Name ?
     {
         List<MovieEntity> result = dao.queryBuilder()
                 .where()
                 .eq("title", name)
+                .query();
+        System.out.println(MovieEntity.toMovies(result).get(0));
+        return MovieEntity.toMovies(result).get(0);
+    }*/
+
+    public Movie getMovie(String apiID) throws SQLException //get by ID oder Name ?
+    {
+        List<MovieEntity> result = dao.queryBuilder()
+                .where()
+                .eq("apiID", apiID)
                 .query();
         System.out.println(MovieEntity.toMovies(result).get(0));
         return MovieEntity.toMovies(result).get(0);

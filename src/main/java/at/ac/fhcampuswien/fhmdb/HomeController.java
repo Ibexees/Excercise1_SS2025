@@ -1,6 +1,8 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
+import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistMovieEntity;
+import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.MovieComparator;
@@ -67,21 +69,51 @@ public class HomeController implements Initializable, MovieCellActionHandler
     public ObservableList<Movie> watchListMovies = FXCollections.observableArrayList();
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
-    private MovieRepository repository = new MovieRepository();
+    private MovieRepository movieRepository = new MovieRepository();
+    private WatchlistRepository watchlistRepository = new WatchlistRepository();
 
 
     private boolean asc;
 
+    private void initializeWatchlistFromDB() throws SQLException
+    {
+        List<WatchlistMovieEntity> dbWatchlist = watchlistRepository.getWatchlist();
+        ArrayList<Movie> initCache = new ArrayList<>();
+
+        for(WatchlistMovieEntity dbWatchlistMovie :  dbWatchlist)
+        {
+           initCache.addAll(allMovies.stream().filter(movie -> movie.getId().equals( dbWatchlistMovie.getApiId())).toList());
+        }
+        Set<Movie> erasedDuplicates = new TreeSet<Movie>(new MovieComparator());
+        erasedDuplicates.addAll(initCache);
+        watchListMovies.addAll(erasedDuplicates);
+    }
+
+    public void showMovieDetails(Movie movie)
+    {
+        return;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //TODO: replace with real read, write DB logic
+        Boolean internetConnection = false;
         try
         {
-            repository.removeAll();
-            repository.addAllMovies(allMovies);
-            allMovies = repository.getAllMovies();
-            allMovies.clear();
-            allMovies.add(repository.getMovie("Inception"));
+            if(internetConnection)
+            {
+                movieRepository.removeAll();
+                movieRepository.addAllMovies(allMovies);
+                initializeWatchlistFromDB();
+                //allMovies.clear();
+                //allMovies.add(movieRepository.getMovie("86642997-ee66-4102-ade1-54941a1d3a6e")); //Inception 86642997-ee66-4102-ade1-54941a1d3a6e
+            }
+            else
+            {
+                allMovies.clear();
+                allMovies = movieRepository.getAllMovies();
+                initializeWatchlistFromDB();
+            }
+
         } catch (SQLException e)
         {
             throw new RuntimeException(e);//TODO: GUI Exception Handling!
@@ -93,7 +125,11 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
             // initialize UI stuff
             movieListView.setItems(observableMovies);   // set data of observable list to list view
-            movieListView.setCellFactory(movieListView -> new MovieCell(this)); // use custom cell factory to display data //erweitert um this Parameter um einen Referenz auf Homecontroller als "Eventhandler" an MovieCell zu Übergeben
+            movieListView.setCellFactory(movieListView -> new MovieCell(
+                    movie -> onAddWatchlistClicked(movie),
+                    movie -> showMovieDetails(movie),
+                    movie -> onRemoveWatchlistClicked(movie))
+            ); // use custom cell factory to display data //erweitert um this Parameter um einen Referenz auf Homecontroller als "Eventhandler" an MovieCell zu Übergeben
 
             genreComboBox.getItems().addAll(Genre.values());
             genreComboBox.setPromptText("Filter by Genre");
@@ -129,7 +165,11 @@ public class HomeController implements Initializable, MovieCellActionHandler
                 sortBtn.setText("Sort (asc)");
             }
             movieListView.setItems( observableMovies);   // set data of observable list to list view
-            movieListView.setCellFactory(movieListView -> new MovieCell(this)); // use custom cell factory to display data
+            movieListView.setCellFactory(movieListView -> new MovieCell(
+                    movie -> onAddWatchlistClicked(movie),
+                    movie -> showMovieDetails(movie),
+                    movie -> onRemoveWatchlistClicked(movie))
+            ); // use custom cell factory to display data
         });
 
 
@@ -364,6 +404,14 @@ public class HomeController implements Initializable, MovieCellActionHandler
         if(!movieInList)
         {
             watchListMovies.add(movie);
+            try
+            {
+                watchlistRepository.addToWatchlist(new WatchlistMovieEntity(movie));
+            } catch (SQLException e)
+            {
+                //TODO: GUI-ExceptionHandling
+                throw new RuntimeException(e);
+            }
             System.out.println("Movie added to Watchlist");
         }
         else
@@ -389,6 +437,14 @@ public class HomeController implements Initializable, MovieCellActionHandler
         if(movieInList)
         {
             watchListMovies.remove(movie);
+            try
+            {
+                watchlistRepository.removeFromWatchlist(movie.getId());
+            } catch (SQLException e)
+            {
+                //TODO: GUI Exceptionhandling
+                throw new RuntimeException(e);
+            }
             System.out.println("Movie removed from Watchlist");
         }
         else
