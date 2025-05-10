@@ -2,6 +2,7 @@ package at.ac.fhcampuswien.fhmdb.dataLayer;
 
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
+import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -11,6 +12,8 @@ import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werden!
 {
@@ -20,6 +23,7 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
 
     private static ConnectionSource connectionSource;
     private Dao<MovieEntity, Long> dao;
+    private final Map<Class<?>, Dao<?, ?>> daoCache = new HashMap<>();
 
     private static DatabaseManager instance;
 
@@ -28,12 +32,34 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
         return this.dao;
     }
 
+    public <T,ID> Dao<T,ID> getDynamicDao(Class<T> providedClass)
+    {
+        synchronized (daoCache)  //synchronized ermöglicht nur Single Thread zugriffe auf folgenden CodeBlock
+        {
+            if(!daoCache.containsKey(providedClass)) //prüft ob die Klasse (Entity/Tabelle) zu der wir ein Dao möchten in unserem DaoChache NICHT enthalten ist
+            {
+                try
+                {
+                    Dao<T,ID> dao = DaoManager.createDao(connectionSource, providedClass);
+                    daoCache.put(providedClass, dao);
+                }
+                catch (SQLException e)
+                {
+                    throw new RuntimeException("Failed to create DAO for: " + providedClass.getSimpleName(), e);
+                }
+            }
+            return (Dao<T,ID>) daoCache.get(providedClass);
+        }
+
+    }
+
+
     private DatabaseManager()
     {
         try
         {
             createConnectionSource();
-            dao = DaoManager.createDao(connectionSource, MovieEntity.class);
+            //dao = DaoManager.createDao(connectionSource, MovieEntity.class);
             createTables();
         } catch (SQLException e)
         {
@@ -64,6 +90,7 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
     private static void createTables() throws SQLException
     {
         TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
+        TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
     }
 
     private static void createConnectionSource() throws SQLException

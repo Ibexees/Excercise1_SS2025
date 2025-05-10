@@ -35,7 +35,11 @@ public class MovieCell extends ListCell<Movie> {
     private final ImageView posterView = new ImageView();
     private final HBox buttonsHbox = new HBox(showDetailsBtn, addWatchlistBtn,removeWatchlistBtn);
     private final HBox layout = new HBox(/*posterView,*/ textLayout,buttonsHbox);
-    private final MovieCellActionHandler actionHandler;
+    //private final MovieCellActionHandler actionHandler;
+
+    private final AddWatchlistHandler addHandler;
+    private final ShowDetailsHandler detailsHandler;
+    private final RemoveWatchlistHandler removeHandler;
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
@@ -129,7 +133,8 @@ public class MovieCell extends ListCell<Movie> {
         removeWatchlistBtn.setManaged(false);
     }
 
-    public MovieCell(MovieCellActionHandler handler) {
+    //Implementation von Buttons ohne Functional Interfaces
+    /*public MovieCell(MovieCellActionHandler handler) {
         this.actionHandler = handler;
 
         // setup layout etc.
@@ -150,7 +155,32 @@ public class MovieCell extends ListCell<Movie> {
                 actionHandler.onRemoveWatchlistClicked(getItem());
             }
         });
+    }*/
+    public MovieCell(AddWatchlistHandler addHandler, ShowDetailsHandler detailsHandler, RemoveWatchlistHandler removeHandler)
+    {
+        this.addHandler = addHandler;
+        this.detailsHandler = detailsHandler;
+        this.removeHandler = removeHandler;
+
+        addWatchlistBtn.setOnAction(e -> {
+            if (getItem() != null) {
+                addHandler.handle(getItem());
+            }
+        });
+
+        showDetailsBtn.setOnAction(e -> {
+            if (getItem() != null) {
+                detailsHandler.handle(getItem());
+            }
+        });
+
+        removeWatchlistBtn.setOnAction(e -> {
+            if (getItem() != null) {
+                removeHandler.handle(getItem());
+            }
+        });
     }
+
 }
 
 
