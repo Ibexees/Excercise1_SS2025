@@ -27,37 +27,30 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
 
     private static DatabaseManager instance;
 
-    public Dao<MovieEntity, Long> getDao()
-    {
+    public Dao<MovieEntity, Long> getDao() {
         return this.dao;
     }
 
-    public <T,ID> Dao<T,ID> getDynamicDao(Class<T> providedClass)
-    {
+    public <T, ID> Dao<T, ID> getDynamicDao(Class<T> providedClass) {
         synchronized (daoCache)  //synchronized ermöglicht nur Single Thread zugriffe auf folgenden CodeBlock
         {
-            if(!daoCache.containsKey(providedClass)) //prüft ob die Klasse (Entity/Tabelle) zu der wir ein Dao möchten in unserem DaoChache NICHT enthalten ist
+            if (!daoCache.containsKey(providedClass)) //prüft ob die Klasse (Entity/Tabelle) zu der wir ein Dao möchten in unserem DaoChache NICHT enthalten ist
             {
-                try
-                {
-                    Dao<T,ID> dao = DaoManager.createDao(connectionSource, providedClass);
+                try {
+                    Dao<T, ID> dao = DaoManager.createDao(connectionSource, providedClass);
                     daoCache.put(providedClass, dao);
-                }
-                catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     throw new DataBaseException("Failed to create DAO for: " + providedClass.getSimpleName(), e);
                 }
             }
-            return (Dao<T,ID>) daoCache.get(providedClass);
+            return (Dao<T, ID>) daoCache.get(providedClass);
         }
 
     }
 
 
-    private DatabaseManager()
-    {
-        try
-        {
+    private DatabaseManager() {
+        try {
             createConnectionSource();
             //dao = DaoManager.createDao(connectionSource, MovieEntity.class);
             createTables();
@@ -69,33 +62,28 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
 
     }
 
-    public void testDB() throws SQLException
-    {
+    public void testDB() throws SQLException {
         ArrayList<Genre> list = new ArrayList<>();
         list.add(Genre.ACTION);
         list.add(Genre.ROMANCE);
-        MovieEntity movieEntity = new MovieEntity(new Movie("Your Name","Coming of Age romance", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016).setId("5522a"));
+        MovieEntity movieEntity = new MovieEntity(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)).setReleaseYear(2016).setId("5522a"));
         //MovieEntity movie = new MovieEntity("ID","title","desc",list,10,null,9,5);
         dao.create(movieEntity);
     }
 
-    public static DatabaseManager getDatabase()
-    {
-        if(instance == null)
-        {
+    public static DatabaseManager getDatabase() {
+        if (instance == null) {
             instance = new DatabaseManager();
         }
         return instance;
     }
 
-    private static void createTables() throws SQLException
-    {
+    private static void createTables() throws SQLException {
         TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
         TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
     }
 
-    private static void createConnectionSource() throws SQLException
-    {
-         connectionSource = new JdbcConnectionSource(DB_URL,user,password);
+    private static void createConnectionSource() throws SQLException {
+        connectionSource = new JdbcConnectionSource(DB_URL, user, password);
     }
 }
