@@ -11,9 +11,14 @@ public class MovieRepository
     Dao<MovieEntity, Long> dao;
 
 
-    public MovieRepository()
-    {
+    public MovieRepository() {
+    try {
         this.dao = DatabaseManager.getDatabase().getDynamicDao(MovieEntity.class);
+    } catch (Exception e) {
+        throw new DataBaseException( "could not initialize movie repository" );
+    }
+
+
     }
 
     public void addAllMovies(List<Movie> movies) throws SQLException
@@ -23,6 +28,7 @@ public class MovieRepository
             MovieEntity movieEntity = new MovieEntity(currentMovie);
             dao.create(movieEntity);
         }
+
     }
 
     /*public Movie getMovie(String name) throws SQLException //get by ID oder Name ?

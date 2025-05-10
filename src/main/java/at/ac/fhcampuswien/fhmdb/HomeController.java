@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.dataLayer.DataBaseException;
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistMovieEntity;
 import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistRepository;
@@ -344,13 +345,14 @@ public class HomeController implements Initializable, MovieCellActionHandler
      * orElse(0) is used to handle the case where the list is empty
      * @param movies (list of movie objects to examine)
      * @return int (length of longest title)
+     *
      */
     int getLongestMovieTitle(List<Movie> movies) {
-        return movies.stream()
-                .map(Movie::getTitle)
-                .mapToInt(String::length)
-                .max()
-                .orElse(0);
+        return movies.stream() // stream erstellt, wandelt liste von filmen in datenstrom um
+                .map(Movie::getTitle)     //holt aus movie object den titel raus, strom hat nur noch mehr die strings
+                .mapToInt(String::length) // jeder titel wird in seine länge umgewandelt, stream enthält länge
+                .max() // sucht größte länge raus
+                .orElse(0); //falls liste leer = 0
     }
 
 
@@ -407,12 +409,9 @@ public class HomeController implements Initializable, MovieCellActionHandler
             try
             {
                 watchlistRepository.addToWatchlist(new WatchlistMovieEntity(movie));
-            } catch (SQLException e)
-            {
-                //TODO: GUI-ExceptionHandling
-                throw new RuntimeException(e);
+            } catch (SQLException | DataBaseException e){
+                e.printStackTrace();
             }
-            System.out.println("Movie added to Watchlist");
         }
         else
         {

@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.dataLayer.DataBaseException;
 import at.ac.fhcampuswien.fhmdb.dataLayer.DatabaseManager;
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
@@ -25,6 +26,7 @@ public class FhmdbApplication extends Application {
                 scene.getStylesheets().add(Objects.requireNonNull(FhmdbApplication.class.getResource("styles.css")).toExternalForm());
             } catch (NullPointerException e) {
                 System.err.println("CSS file not found");
+                throw new DataBaseException("CSS file not found");
             }
 
             stage.setTitle("FHMDb");
@@ -33,9 +35,12 @@ public class FhmdbApplication extends Application {
         }
         catch (IOException e) {
             System.err.println("Error loading the FXML file");
+            throw new DataBaseException("Error loading the FXML file");
+        } catch (Exception e) {
+            System.err.println("Error during application start");
+            throw new DataBaseException("unexpected startup error");
         }
 
-        //TODO: Exception Handle
     }
 
     public static void main(String[] args) {

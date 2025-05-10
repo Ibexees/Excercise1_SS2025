@@ -45,7 +45,7 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
                 }
                 catch (SQLException e)
                 {
-                    throw new RuntimeException("Failed to create DAO for: " + providedClass.getSimpleName(), e);
+                    throw new DataBaseException("Failed to create DAO for: " + providedClass.getSimpleName(), e);
                 }
             }
             return (Dao<T,ID>) daoCache.get(providedClass);
@@ -61,8 +61,9 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
             createConnectionSource();
             //dao = DaoManager.createDao(connectionSource, MovieEntity.class);
             createTables();
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
+            throw new DataBaseException("Failed to create connection source", e);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 

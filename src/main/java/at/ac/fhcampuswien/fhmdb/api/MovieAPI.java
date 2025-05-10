@@ -28,6 +28,7 @@ public class MovieAPI {
         String fullUrl = buildUrlWithParams(apiUrl, params);
         HttpURLConnection connection = createHttpConnection(fullUrl);
         return readResponse(connection);
+
     }
 
     private static String buildUrlWithParams(String apiUrl, Map<String, String> params) {

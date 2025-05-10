@@ -13,9 +13,12 @@ public class WatchlistRepository
     Dao<WatchlistMovieEntity, Long> dao;
 
 
-    public WatchlistRepository()
-    {
-        this.dao = DatabaseManager.getDatabase().getDynamicDao(WatchlistMovieEntity.class);
+    public WatchlistRepository() {
+        try {
+            this.dao = DatabaseManager.getDatabase().getDynamicDao(WatchlistMovieEntity.class);
+        } catch (Exception e) {
+            throw new DataBaseException("could not initialize watchlist repository");
+        }
     }
 
     public List<WatchlistMovieEntity> getWatchlist() throws SQLException

@@ -322,23 +322,23 @@ class HomeControllerTest {
 
     @Test
     public void getLongestMovieTitle(){
-        HomeController homeController = new HomeController();
-        List<Movie> movies = new ArrayList<>();
-        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
+        HomeController homeController = new HomeController();// neues homecontroller objekt erstellt
+        List<Movie> movies = new ArrayList<>(); // leere liste vom typ movie erzeugt
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA))); // liste wird mit 3 filmobjekten gefüllt
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
         movies.add(new Movie("Into the Spiderverse","interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.ACTION)));
 
-        int longestTitleLength = homeController.getLongestMovieTitle(movies);
-        assertEquals(20,longestTitleLength, "longest title has 20 characters");
+        int longestTitleLength = homeController.getLongestMovieTitle(movies); // methode getlongestmovietitle wird aufgerufen
+        assertEquals(20,longestTitleLength, "longest title has 20 characters"); //überprüft ergebniss
     }
 
     @Test
     public void getLongestMovieTitle_emptyList(){
-        HomeController homeController = new HomeController();
-        List<Movie> movies = new ArrayList<>();
+        HomeController homeController = new HomeController(); // neues homecontroller objekt
+        List<Movie> movies = new ArrayList<>();// leere liste vom typ movies wird erstellt
 
-        int longestTitleLength = homeController.getLongestMovieTitle(movies);
-        assertEquals(0,longestTitleLength, "longest title has 0 characters");
+        int longestTitleLength = homeController.getLongestMovieTitle(movies);// // methode getlongest aufgerufen
+        assertEquals(0,longestTitleLength, "longest title has 0 characters"); // meldung wenn 0, dh. test fehlgeschlagen
     }
 
     @Test
