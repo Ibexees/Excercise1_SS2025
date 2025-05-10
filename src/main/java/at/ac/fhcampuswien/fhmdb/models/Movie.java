@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
+import at.ac.fhcampuswien.fhmdb.api.ApiException;
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
@@ -64,7 +65,7 @@ public class Movie {
     }
 
 
-    public static List<Movie> initializeMovies(Map<String,String> parameters){
+    public static List<Movie> initializeMovies(Map<String,String> parameters) throws RuntimeException {
         List<Movie> movies = new ArrayList<>();
 
         String apiResponse;
@@ -75,28 +76,9 @@ public class Movie {
             //System.out.println(apiResponse);
             movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | ApiException e) {
+            throw new RuntimeException("Failed to initialize movies: " + e.getMessage(), e);
         }
-
-        //Stock Movies
-        /*
-        movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
-        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
-        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)));
-        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
-        movies.add(new Movie ("Kung Fu Panda", "Wuxi-fingergriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
-        movies.add(new Movie("Inception", "A dream within a dream", Arrays.asList(Genre.SCIENCE_FICTION, Genre.THRILLER)));
-        movies.add(new Movie("The Dark Knight", "The rise of the Batman", Arrays.asList(Genre.ACTION, Genre.CRIME, Genre.DRAMA)));
-        movies.add(new Movie("Interstellar", "Love and science beyond time", Arrays.asList(Genre.SCIENCE_FICTION, Genre.DRAMA, Genre.ADVENTURE)));
-        movies.add(new Movie("The Grand Budapest Hotel", "A whimsical tale of adventure and crime", Arrays.asList(Genre.COMEDY, Genre.CRIME, Genre.DRAMA)));
-        movies.add(new Movie("Whiplash", "The cost of greatness", Arrays.asList(Genre.DRAMA, Genre.DOCUMENTARY)));
-        movies.add(new Movie("Gladiator", "A general becomes a gladiator", Arrays.asList(Genre.ACTION, Genre.DRAMA, Genre.HISTORY)));
-        movies.add(new Movie("The Conjuring", "Based on true paranormal investigations", Arrays.asList(Genre.HORROR, Genre.THRILLER)));
-        movies.add(new Movie("The Revenant", "Survival against all odds", Arrays.asList(Genre.ADVENTURE, Genre.DRAMA, Genre.WESTERN)));
-        movies.add(new Movie("Coco", "A boy's journey through the Land of the Dead", Arrays.asList(Genre.ANIMATION, Genre.FAMILY, Genre.MUSICAL)));
-        movies.add(new Movie("Mad Max: Fury Road", "A high-octane road to redemption", Arrays.asList(Genre.ACTION, Genre.ADVENTURE, Genre.SCIENCE_FICTION)));*/
-
         return movies;
     }
 

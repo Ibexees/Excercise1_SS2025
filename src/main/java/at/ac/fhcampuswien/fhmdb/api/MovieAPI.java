@@ -11,59 +11,71 @@ import java.util.Scanner;
 public class MovieAPI {
 
     /**
-     * This class contains methods to interact with the online movie API, specifically to send HTTP GET requests and receive movie data as a JSON response
-     * Its Purpose is to build a URL with query parameters, send the HTTP GET request to the movie API, and return the JSON response as a String
-     * @param params (key value pair map, used to add the query parameters to the URL)
-     * @return String
-     * @throws IOException (might throw one if the HTTP request fails or occurrence of connectivity problems
+     * This class contains methods to interact with the online movie API,
+     * specifically to send HTTP GET requests and receive movie data as a JSON response.
+     * <p>
+     * Its purpose is to build a URL with query parameters, send the HTTP GET request to the movie API,
+     * and return the JSON response as a String.
+     *
+     * @param params a key-value pair map used to add query parameters to the URL
+     * @return the JSON response as a String
+     * @throws IOException   if a network or I/O error occurs during the request
+     * @throws ApiException  if the API responds with a non-successful HTTP status code
      */
-    public static String getMovies(Map<String, String> params) throws IOException {
-        StringBuilder response = new StringBuilder();
-        String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
-        StringBuilder urlBuilder = new StringBuilder(apiUrl);
 
-        //Build URL with parameters
+    public static String getMovies(Map<String, String> params) throws ApiException, IOException {
+        String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
+        String fullUrl = buildUrlWithParams(apiUrl, params);
+        HttpURLConnection connection = createHttpConnection(fullUrl);
+        return readResponse(connection);
+    }
+
+    private static String buildUrlWithParams(String apiUrl, Map<String, String> params) {
+        StringBuilder urlBuilder = new StringBuilder(apiUrl);
         if (params != null && !params.isEmpty()) {
             urlBuilder.append("?");
-            /*
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                urlBuilder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8))
-                        .append("=")
-                        .append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
-                        .append("&");
-
-            }
-            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
-*/
-            //mit Java Streams
             params.entrySet().stream()
-                    .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+                    .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8)
+                            + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
                     .forEach(param -> urlBuilder.append(param).append("&"));
             urlBuilder.deleteCharAt(urlBuilder.length() - 1);
-            //System.out.println(urlBuilder);
         }
+        return urlBuilder.toString();
+    }
 
-        URL url = new URL(urlBuilder.toString());
+    private static HttpURLConnection createHttpConnection(String urlString) throws ApiException, IOException {
+        URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        //connection.setRequestProperty("Accept", "application/json");
         connection.setRequestProperty("User-Agent", "http.agent");
 
         int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            //System.out.println("HTTP Request succeeded: " + responseCode);
-        }
-        else {
-            throw new IOException("HTTP Request failed with Errorcode: " + responseCode);
+
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new ApiException("HTTP Request zur Movie API failed: " + responseCode);
         }
 
-        Scanner scanner = new Scanner(connection.getInputStream());
-        while (scanner.hasNextLine()) {
-            response.append(scanner.nextLine());
-        }
-        scanner.close();
-        connection.disconnect();
+        return connection;
+    }
 
+    private static String readResponse(HttpURLConnection connection) throws IOException {
+        StringBuilder response = new StringBuilder();
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(connection.getInputStream());
+            while (scanner.hasNextLine()) {
+                response.append(scanner.nextLine());
+            }
+        } catch (IOException e) {
+            throw new IOException("Error beim auslesen des responses: " + e.getMessage(), e);
+        }
+
+        finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+            connection.disconnect();
+        }
         return response.toString();
     }
 }

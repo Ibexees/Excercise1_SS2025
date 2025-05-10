@@ -42,7 +42,7 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
 
     }
 
-    public  void testDB() throws SQLException
+    public void testDB() throws SQLException
     {
         ArrayList<Genre> list = new ArrayList<>();
         list.add(Genre.ACTION);
@@ -52,7 +52,7 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
         dao.create(movieEntity);
     }
 
-    public static DatabaseManager  getDatabase()
+    public static DatabaseManager getDatabase()
     {
         if(instance == null)
         {

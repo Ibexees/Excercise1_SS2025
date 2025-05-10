@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -20,8 +21,14 @@ public class Deserializer {
         List<Movie> movies = new ArrayList<>();
         Gson gson = new Gson();
 
-        Type listType = new TypeToken<ArrayList<Movie>>(){}.getType();
-        movies = gson.fromJson(apiResponseJsonFile, listType);
+        try {
+            Type listType = new TypeToken<ArrayList<Movie>>() {
+            }.getType();
+            movies = gson.fromJson(apiResponseJsonFile, listType);
+        }
+        catch (JsonSyntaxException e) {
+            throw new JsonSyntaxException("Failed to deserialize JSON response into movie model", e);
+        }
         return movies;
     }
 }
