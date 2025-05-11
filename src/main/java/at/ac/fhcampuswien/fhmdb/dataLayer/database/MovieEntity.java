@@ -1,7 +1,6 @@
-package at.ac.fhcampuswien.fhmdb.dataLayer; //import libraries
-import at.ac.fhcampuswien.fhmdb.models.Genre;
-import at.ac.fhcampuswien.fhmdb.models.Movie;
-import com.google.gson.annotations.SerializedName;
+package at.ac.fhcampuswien.fhmdb.dataLayer.database; //import libraries
+import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 

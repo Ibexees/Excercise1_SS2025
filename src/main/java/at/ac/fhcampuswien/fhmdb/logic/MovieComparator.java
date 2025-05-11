@@ -1,4 +1,6 @@
-package at.ac.fhcampuswien.fhmdb.models;
+package at.ac.fhcampuswien.fhmdb.logic;
+
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 
 import java.util.Comparator;
 

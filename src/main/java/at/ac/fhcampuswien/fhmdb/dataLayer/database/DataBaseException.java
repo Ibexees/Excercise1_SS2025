@@ -1,4 +1,4 @@
-package at.ac.fhcampuswien.fhmdb.dataLayer;
+package at.ac.fhcampuswien.fhmdb.dataLayer.database;
 
 public class DataBaseException extends RuntimeException {
 

@@ -1,6 +1,6 @@
-package at.ac.fhcampuswien.fhmdb.api;
+package at.ac.fhcampuswien.fhmdb.dataLayer.api;
 
-import at.ac.fhcampuswien.fhmdb.models.Movie;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

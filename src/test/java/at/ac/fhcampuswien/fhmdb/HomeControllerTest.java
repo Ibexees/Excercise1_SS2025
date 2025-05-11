@@ -1,24 +1,17 @@
 package at.ac.fhcampuswien.fhmdb;
-import at.ac.fhcampuswien.fhmdb.api.Deserializer;
-import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.dataLayer.DatabaseManager;
-import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
-import at.ac.fhcampuswien.fhmdb.models.Genre;
-import at.ac.fhcampuswien.fhmdb.models.Movie;
-import at.ac.fhcampuswien.fhmdb.models.Rating;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.scene.control.ListView;
+import at.ac.fhcampuswien.fhmdb.dataLayer.api.Deserializer;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.DatabaseManager;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieEntity;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
+import at.ac.fhcampuswien.fhmdb.logic.MovieAnalysisService;
+import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.*;
-
-import org.testfx.framework.junit5.ApplicationTest;
-import org.testfx.api.FxRobot;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +20,14 @@ class HomeControllerTest {
 
     private List<Movie> movies;
 
+    private MovieAnalysisService movieAnalysisService;
+
+    @BeforeEach
+    void setUp() {
+        // Initialize the services before each test
+
+        movieAnalysisService = new MovieAnalysisService();
+    }
     //Muss auf die neuen Attribute (releaseYear etc.) erweitert werden.
     @Test
     public void movie_should_have_Attributes()
@@ -207,154 +208,132 @@ class HomeControllerTest {
     }
 
     @Test
-    public void return_only_most_popular_Actor() throws SQLException
-    {
-        HomeController homeController = new HomeController();
+    public void return_only_most_popular_Actor() {
         List<Movie> sortedMovies = new ArrayList<>();
 
         sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setMainCast(new String[]{"Nathan Graves","Alucard"}));
-        sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
-        sortedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
-        sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setMainCast(new String[]{"Soma Cruz","Yoko Belnades"}));
-        sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setMainCast(new String[]{"Jonathan Morris","Charlotte Aulin"}));
+        sortedMovies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setMainCast(new String[]{"Soma Cruz","Yoko Belnades"}));
+        sortedMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setMainCast(new String[]{"Jonathan Morris","Charlotte Aulin"}));
 
+        String mostCastActor = "Nathan Graves"; // expected
+        String mostCastActorFromMethod = movieAnalysisService.getMostPopularActor(sortedMovies); // actual
 
-        String mostCastActor = "Nathan Graves"; //expected
-        String mostCastActorFromMethod; //actual
-        mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
-
-        assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
-
+        assertEquals(mostCastActor, mostCastActorFromMethod, "Expected: " + mostCastActor + " Actual: " + mostCastActorFromMethod);
     }
 
     @Test
-    public void return_multiple_most_popular_Actors() throws SQLException
-    {
-        HomeController homeController = new HomeController();
+    public void return_multiple_most_popular_Actors() {
         List<Movie> sortedMovies = new ArrayList<>();
 
         sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setMainCast(new String[]{"Nathan Graves","Alucard"}));
-        sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
-        sortedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
-        sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setMainCast(new String[]{"Soma Cruz","Yoko Belnades"}));
-        sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setMainCast(new String[]{"Jonathan Morris","Julius Belmont"}));
+        sortedMovies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setMainCast(new String[]{"Nathan Graves","Julius Belmont"}));
+        sortedMovies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setMainCast(new String[]{"Soma Cruz","Yoko Belnades"}));
+        sortedMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setMainCast(new String[]{"Jonathan Morris","Julius Belmont"}));
 
+        String mostCastActor = "Julius Belmont, Nathan Graves"; // expected
+        String mostCastActorFromMethod = movieAnalysisService.getMostPopularActor(sortedMovies); // actual
 
-        String mostCastActor = "Julius Belmont, Nathan Graves"; //expected
-        String mostCastActorFromMethod; //actual
-        mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
-
-        assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
-
+        assertEquals(mostCastActor, mostCastActorFromMethod, "Expected: " + mostCastActor + " Actual: " + mostCastActorFromMethod);
     }
 
     @Test
-    public void no_most_popular_Actor_returned() throws SQLException
-    {
-        HomeController homeController = new HomeController();
+    public void no_most_popular_Actor_returned() {
         List<Movie> sortedMovies = new ArrayList<>();
 
         sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
-        sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
-        sortedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)));
-        sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
-        sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
+        sortedMovies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
+        sortedMovies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)));
+        sortedMovies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
+        sortedMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
 
+        String mostCastActor = ""; // expected
+        String mostCastActorFromMethod = movieAnalysisService.getMostPopularActor(sortedMovies); // actual
 
-        String mostCastActor = ""; //expected
-        String mostCastActorFromMethod; //actual
-        mostCastActorFromMethod = homeController.getMostPopularActor(sortedMovies);
-
-        assertEquals(mostCastActor,mostCastActorFromMethod,"expected: "+mostCastActor+" actual: "+mostCastActorFromMethod);
-
+        assertEquals(mostCastActor, mostCastActorFromMethod, "Expected: " + mostCastActor + " Actual: " + mostCastActorFromMethod);
     }
 
     @Test
-    public void only_movies_between_years_returned() throws SQLException
-    {
-        HomeController homeController = new HomeController();
+    public void only_movies_between_years_returned() {
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016));
-        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setReleaseYear(2000));
-        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
-        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
-        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setReleaseYear(2000));
+        movies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        movies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
 
         List<Movie> expectedMovies = new ArrayList<>();
         expectedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016));
-        expectedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
-        expectedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
-        expectedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+        expectedMovies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        expectedMovies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        expectedMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
 
+        List<Movie> result = movieAnalysisService.getMoviesBetweenYears(movies, 2005, 2020);
 
-        assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2005,2020),"expected: "+expectedMovies+" actual: "+movies);
-
+        assertEquals(expectedMovies, result, "Expected: " + expectedMovies + " Actual: " + result);
     }
 
     @Test
-    public void no_movies_between_years_returned() throws SQLException
-    {
-        HomeController homeController = new HomeController();
+    public void no_movies_between_years_returned() {
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)).setReleaseYear(2016));
-        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setReleaseYear(2000));
-        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
-        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
-        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)).setReleaseYear(2000));
+        movies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        movies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
 
         List<Movie> expectedMovies = new ArrayList<>();
 
-        assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2020,2020),"expected: "+expectedMovies+" actual: "+movies);
+        List<Movie> result = movieAnalysisService.getMoviesBetweenYears(movies, 2020, 2020);
 
+        assertEquals(expectedMovies, result, "Expected: " + expectedMovies + " Actual: " + result);
     }
 
     @Test
-    public void no_movies_release_year_set() throws SQLException
-    {
-        HomeController homeController = new HomeController();
+    public void no_movies_release_year_set() {
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
-        movies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
-        movies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
-        movies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
-        movies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
+        movies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        movies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
 
         List<Movie> expectedMovies = new ArrayList<>();
-        expectedMovies.add(new Movie ("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
-        expectedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
-        expectedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
+        expectedMovies.add(new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER,Genre.MYSTERY)).setReleaseYear(2018));
+        expectedMovies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)).setReleaseYear(2005));
+        expectedMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)).setReleaseYear(2019));
 
-        assertEquals(expectedMovies,homeController.getMoviesBetweenYears(movies,2005,2019),"expected: "+expectedMovies+" actual: "+movies);
+        List<Movie> result = movieAnalysisService.getMoviesBetweenYears(movies, 2005, 2019);
 
+        assertEquals(expectedMovies, result, "Expected: " + expectedMovies + " Actual: " + result);
     }
 
     @Test
-    public void getLongestMovieTitle() throws SQLException {
-        HomeController homeController = new HomeController();// neues homecontroller objekt erstellt
-        List<Movie> movies = new ArrayList<>(); // leere liste vom typ movie erzeugt
-        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA))); // liste wird mit 3 filmobjekten gefüllt
+    public void getLongestMovieTitle() {
+        List<Movie> movies = new ArrayList<>();
+        movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
         movies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
         movies.add(new Movie("Into the Spiderverse","interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.ACTION)));
 
-        int longestTitleLength = homeController.getLongestMovieTitle(movies); // methode getlongestmovietitle wird aufgerufen
-        assertEquals(20,longestTitleLength, "longest title has 20 characters"); //überprüft ergebniss
+        int longestTitleLength = movieAnalysisService.getLongestMovieTitle(movies);
+        assertEquals(20, longestTitleLength, "Longest title has 20 characters");
     }
 
     @Test
-    public void getLongestMovieTitle_emptyList() throws SQLException {
-        HomeController homeController = new HomeController(); // neues homecontroller objekt
-        List<Movie> movies = new ArrayList<>();// leere liste vom typ movies wird erstellt
+    public void getLongestMovieTitle_emptyList() {
+        List<Movie> movies = new ArrayList<>();
 
-        int longestTitleLength = homeController.getLongestMovieTitle(movies);// // methode getlongest aufgerufen
-        assertEquals(0,longestTitleLength, "longest title has 0 characters"); // meldung wenn 0, dh. test fehlgeschlagen
+        int longestTitleLength = movieAnalysisService.getLongestMovieTitle(movies);
+        assertEquals(0, longestTitleLength, "Longest title has 0 characters");
     }
 
     @Test
-    public void test_CountMoviesFrom_givenDirector_returnCorrectCount() throws SQLException { //for a particular director
-        HomeController homeController = new HomeController();
+    public void test_CountMoviesFrom_givenDirector_returnCorrectCount() {
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
@@ -363,23 +342,21 @@ class HomeControllerTest {
         movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.ACTION, Genre.ACTION)));
         movies.add(new Movie("Into the Spiderverse", "interdimesional spider people", Arrays.asList(Genre.ACTION, Genre.ACTION)));
 
-        //set directors
+        // Set directors
         movies.get(0).setDirectors(new String[]{"Makato Shinkai"});
         movies.get(1).setDirectors(new String[]{"Antoine Fuqua"});
         movies.get(2).setDirectors(new String[]{"Martin Scorsese"});
         movies.get(3).setDirectors(new String[]{"Mark Osborne"});
         movies.get(4).setDirectors(new String[]{"Bob Persichetti"});
-
 
         long expected = 1;
-        long actual = homeController.countMoviesFrom(movies, "Makato Shinkai");
+        long actual = movieAnalysisService.countMoviesFrom(movies, "Makato Shinkai");
 
-        assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+        assertEquals(expected, actual, "Expected: " + expected + " Actual: " + actual);
     }
 
     @Test
-    public void test_CountMoviesFrom_wrongDirector_returnCorrectCount() throws SQLException { //for wrong director
-        HomeController homeController = new HomeController();
+    public void test_CountMoviesFrom_wrongDirector_returnCorrectCount() {
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
@@ -388,7 +365,7 @@ class HomeControllerTest {
         movies.add(new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.ACTION, Genre.ACTION)));
         movies.add(new Movie("Into the Spiderverse", "interdimesional spider people", Arrays.asList(Genre.ACTION, Genre.ACTION)));
 
-        //set directors
+        // Set directors
         movies.get(0).setDirectors(new String[]{"Makato Shinkai"});
         movies.get(1).setDirectors(new String[]{"Antoine Fuqua"});
         movies.get(2).setDirectors(new String[]{"Martin Scorsese"});
@@ -396,14 +373,13 @@ class HomeControllerTest {
         movies.get(4).setDirectors(new String[]{"Bob Persichetti"});
 
         long expected = 0;
-        long actual = homeController.countMoviesFrom(movies, "Denzel Washington");
+        long actual = movieAnalysisService.countMoviesFrom(movies, "Denzel Washington");
 
-        assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+        assertEquals(expected, actual, "Expected: " + expected + " Actual: " + actual);
     }
 
     @Test
-    public void test_CountMoviesFrom_noDirector_returnCorrectCount() throws SQLException { // no director at all
-        HomeController homeController = new HomeController();
+    public void test_CountMoviesFrom_noDirector_returnCorrectCount() {
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)));
@@ -413,10 +389,11 @@ class HomeControllerTest {
         movies.add(new Movie("Into the Spiderverse", "interdimesional spider people", Arrays.asList(Genre.ACTION, Genre.ACTION)));
 
         long expected = 0;
-        long actual = homeController.countMoviesFrom(movies, "Mark Osborne");
+        long actual = movieAnalysisService.countMoviesFrom(movies, "Mark Osborne");
 
-        assertEquals(expected, actual, "expected: " + expected + " actual: " + actual);
+        assertEquals(expected, actual, "Expected: " + expected + " Actual: " + actual);
     }
+
 
     @Test
     public void testDeserializerWithOneSampleResponse() {

@@ -1,6 +1,6 @@
-package at.ac.fhcampuswien.fhmdb.dataLayer;
+package at.ac.fhcampuswien.fhmdb.dataLayer.database;
 
-import at.ac.fhcampuswien.fhmdb.models.Movie;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;
@@ -51,20 +51,28 @@ public class MovieRepository
         return MovieEntity.toMovies(result).get(0);
     }
 
-    public List<Movie> getAllMovies() throws SQLException
-    {
-        return MovieEntity.toMovies(dao.queryForAll());
+    public List<Movie> getAllMovies() {
+        try {
+            return MovieEntity.toMovies(dao.queryForAll());
+        } catch (SQLException e) {
+            throw new DataBaseException("Failed to retrieve all movies", e);
+        }
     }
 
-    public int removeAll() throws SQLException
-    {
-        dao.deleteBuilder().delete();
-        return 1;
+    public int removeAll() {
+        try {
+            return dao.deleteBuilder().delete();
+        } catch (SQLException e) {
+            throw new DataBaseException("Failed to remove all movies", e);
+        }
     }
 
-    public List<MovieEntity> readAllMovies() throws SQLException
-    {
-       return dao.queryForAll();
+    public List<MovieEntity> readAllMovies() {
+        try {
+            return dao.queryForAll();
+        } catch (SQLException e) {
+            throw new DataBaseException("Failed to read all movies", e);
+        }
     }
 
 

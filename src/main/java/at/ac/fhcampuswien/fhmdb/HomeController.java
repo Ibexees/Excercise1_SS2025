@@ -1,16 +1,17 @@
 package at.ac.fhcampuswien.fhmdb;
 
-import at.ac.fhcampuswien.fhmdb.api.MovieAPIException;
-import at.ac.fhcampuswien.fhmdb.api.Deserializer;
-import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.dataLayer.DataBaseException;
-import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
-import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistMovieEntity;
-import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistRepository;
-import at.ac.fhcampuswien.fhmdb.models.Genre;
-import at.ac.fhcampuswien.fhmdb.models.Movie;
-import at.ac.fhcampuswien.fhmdb.models.MovieComparator;
-import at.ac.fhcampuswien.fhmdb.models.Rating;
+import at.ac.fhcampuswien.fhmdb.dataLayer.api.MovieAPIException;
+import at.ac.fhcampuswien.fhmdb.dataLayer.api.Deserializer;
+import at.ac.fhcampuswien.fhmdb.dataLayer.api.MovieAPI;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.DataBaseException;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistMovieEntity;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistRepository;
+import at.ac.fhcampuswien.fhmdb.logic.MovieAnalysisService;
+import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
+import at.ac.fhcampuswien.fhmdb.logic.MovieComparator;
+import at.ac.fhcampuswien.fhmdb.logic.models.Rating;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCellActionHandler;
 import com.jfoenix.controls.JFXButton;
@@ -29,12 +30,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HomeController implements Initializable, MovieCellActionHandler
 {
@@ -77,12 +76,17 @@ public class HomeController implements Initializable, MovieCellActionHandler
     public ObservableList<Movie> watchListMovies = FXCollections.observableArrayList();
     public ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
-    private MovieRepository movieRepository = new MovieRepository();
+    public MovieRepository movieRepository;
     private WatchlistRepository watchlistRepository = new WatchlistRepository();
+
+    private MovieAnalysisService movieAnalysisService;
 
     private boolean asc;
 
-    public HomeController() throws SQLException {
+    public HomeController() {
+            movieAnalysisService = new MovieAnalysisService();
+            movieRepository = new MovieRepository();
+            watchlistRepository = new WatchlistRepository();
     }
 
     private void initializeWatchlistFromDB() throws SQLException
@@ -104,104 +108,34 @@ public class HomeController implements Initializable, MovieCellActionHandler
         return;
     }
 
-    /*
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Boolean internetConnection = false;
-        try {
-            allMovies = Movie.initializeMovies(parameters);
-            movieRepository.removeAll(); // clear old DB data
-            movieRepository.addAllMovies(allMovies); // cache new movies
-            initializeWatchlistFromDB();
-        } catch (SQLException e) {
-            showDatabaseErrorDialog(e);
-        }
-
-        resetBtn.setDisable(true);
-            resetBtn.setVisible(false);
-            observableMovies.addAll(allMovies);         // add dummy data to observable list
-
-            // initialize UI stuff
-            movieListView.setItems(observableMovies);   // set data of observable list to list view
-            movieListView.setCellFactory(movieListView -> new MovieCell(
-                    movie -> onAddWatchlistClicked(movie),
-                    movie -> showMovieDetails(movie),
-                    movie -> onRemoveWatchlistClicked(movie))
-            ); // use custom cell factory to display data //erweitert um this Parameter um einen Referenz auf Homecontroller als "Eventhandler" an MovieCell zu Übergeben
-
-            genreComboBox.getItems().addAll(Genre.values());
-            genreComboBox.setPromptText("Filter by Genre");
-            ratingComboBox.setPromptText("Filter by Rating and Above");
-            ratingComboBox.getItems().addAll(Rating.values());
-
-        searchBtn.setOnAction(this::handleFilter);
-        resetBtn.setOnAction(this::handleReset);
-
-        homeBtn.setOnAction(this::handleReset);
-        watchlistBtn.setOnAction(this::displayWatchList);
-
-        isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
-
-        // Sort button example:
-        sortBtn.setOnAction(actionEvent -> {
-            //movieList Leeren
-            //movieListView = new JFXListView<>(); //braucht man nicht, würde mit filtern auch nicht funktionieren (von Elias)
-            if(sortBtn.getText().equals("Sort (asc)"))
-            {
-                    asc = true;
-                    allMovies = sortMovies(asc,allMovies); //damit alle Movies sortieren, ist relevant für das Filtern.
-                    observableMovies = (ObservableList<Movie>) sortMovies(asc,observableMovies);
-
-                    sortBtn.setText("Sort (desc)");
-            }
-           else
-            {
-                asc = false;
-                allMovies = sortMovies(asc,allMovies); //damit alle Movies sortieren, ist relevant für das Filtern.
-                observableMovies = (ObservableList<Movie>) sortMovies(asc,observableMovies);
-
-                sortBtn.setText("Sort (asc)");
-            }
-            movieListView.setItems( observableMovies);   // set data of observable list to list view
-            movieListView.setCellFactory(movieListView -> new MovieCell(
-                    movie -> onAddWatchlistClicked(movie),
-                    movie -> showMovieDetails(movie),
-                    movie -> onRemoveWatchlistClicked(movie))
-            ); // use custom cell factory to display data
-        });
-
-
-
-    }
-*/
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        loadMoviesFromAPIAndCache();
-        setupInitialUIState();
-        setupMovieListView();
-        setupComboBoxes();
-        setupButtonHandlers();
-        setupSortButton();
-        setupResetListener();
+            // Attempt to initialize everything
+            loadMoviesFromAPIAndRefreshDatabase();
+            setupInitialUIState();
+            setupMovieListView();
+            setupComboBoxes();
+            setupButtonHandlers();
+            setupSortButton();
+            setupResetListener();
     }
 
-    private void loadMoviesFromAPIAndCache() {
+    private void loadMoviesFromAPIAndRefreshDatabase() {
         try {
             allMovies = initializeMovies(parameters);
             movieRepository.removeAll();
             movieRepository.addAllMovies(allMovies);
             initializeWatchlistFromDB();
         } catch (DataBaseException e) {
-            showErrorDialog("Database error", "failed to load movies" );
+            showErrorDialog("Database error", "failed to save movies" );
         } catch (Exception e) {
             showErrorDialog("Unknown error", "unexpected error occured" );
+
         }
     }
 
-    public static List<Movie> initializeMovies(Map<String, String> parameters) {
+    public List<Movie> initializeMovies(Map<String, String> parameters) {
         List<Movie> movies = new ArrayList<>();
-
         try {
             // Fetch movies von API
             String apiResponse = MovieAPI.getMovies(parameters);
@@ -218,21 +152,15 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
                 alert.showAndWait();
             });
-
             System.err.println("API failed: " + e.getMessage());
-
-            MovieRepository movieRepository = new MovieRepository();
             try {
                 // Fallback: Movies von Database holen
-
                 movies = movieRepository.getAllMovies();
-
                 System.out.println("Loaded movies from database fallback.");
-            } catch (SQLException dbException) {
+            } catch (DataBaseException dbException) {
                 System.err.println("Database loading failed: " + dbException.getMessage());
             }
         } catch (Exception e) {
-
             throw new RuntimeException("Failed to initialize movies: " + e.getMessage(), e);
         }
 
@@ -482,98 +410,6 @@ public class HomeController implements Initializable, MovieCellActionHandler
         }
     }
 
-    /**
-     * This method identifies the actor(s) who appear in the most movies from a given list, and returns their name(s) as a comma-separated String
-     * Its purpose is to find the actor(s) who are most frequently featured across the provided list of Movie objects and return their name(s) as a comma-separated String
-     * Key concept used is "Stream", which processes list cleanly instead of loops
-     * @param movies (list of movie objects to analyse)
-     * @return String (names of the actor(s) with the most appearance
-     */
-    String getMostPopularActor(List<Movie> movies)
-    {
-        Map<String,Long> actorMap = new HashMap<>();
-        Long maxFeatures = (long) 0;
-        String mostCastActor = "";
-        Stream<Movie> movieStream = movies.stream();
-
-        actorMap = movieStream
-                .flatMap(movie ->  Arrays.stream(movie.getMainCast())) //Actors aus Movie und Maincast array extrahieren
-                .collect(Collectors.groupingBy(actor -> actor, Collectors.counting())); //nach actor gruppieren und vorkommen zählen
-
-        maxFeatures = actorMap.values().stream()
-                .max((cntActor1,cntActor2) -> Long.compare(cntActor1,cntActor2)) //häufigstes Vorkommen feststellen
-                .orElse((long) (0));
-
-        Long finalMaxFeatures = maxFeatures;
-        mostCastActor = actorMap.entrySet().stream()
-                .filter(features -> features.getValue() == finalMaxFeatures) //filtern auf nur maximales Vorkommen
-                .map(entry -> entry.getKey())// passenden Schlüssel zum höchsten Vorkommen finden
-                .collect(Collectors.toList())
-                .stream().collect(Collectors.joining(", ")); //Liste komma separiert weil Laut angabe String returned werden muss
-        //System.out.println(mostCastActor);
-        return mostCastActor;
-    }
-
-    /**
-     * This method finds the length of the longest movie title from a given list of Movie objects
-     * Key concept used is "Stream", for processing the list cleanly
-     * map() is used to extract movie titles
-     * mapToInt() is used to convert strings to their lengths
-     * max() is used to find the longest length
-     * orElse(0) is used to handle the case where the list is empty
-     * @param movies (list of movie objects to examine)
-     * @return int (length of longest title)
-     *
-     */
-    int getLongestMovieTitle(List<Movie> movies) {
-        return movies.stream() // stream erstellt, wandelt liste von filmen in datenstrom um
-                .map(Movie::getTitle)     //holt aus movie object den titel raus, strom hat nur noch mehr die strings
-                .mapToInt(String::length) // jeder titel wird in seine länge umgewandelt, stream enthält länge
-                .max() // sucht größte länge raus
-                .orElse(0); //falls liste leer = 0
-    }
-
-
-    /**
-     * This method counts how many movies in the provided list were directed by a specific director
-     * Key concept used is "Stream", for processing the list cleanly
-     * filter() is used to only keep the movies that match the director
-     * Arrays.asList() converts array of directors to a list for searching
-     * contains() checks if the director is listed
-     * count() returns the number of matching elements
-     * @param movies (list of movie objects to examine)
-     * @param director (the director's name to search for)
-     * @return long (number of movies directed by the given name)
-     */
-    long countMoviesFrom(List<Movie> movies, String director)
-    {
-        return movies.stream()
-                .filter(movie -> movie.getDirectors() != null &&
-                        Arrays.asList(movie.getDirectors()).contains(director))
-                .count();
-    }
-
-    /**
-     * This method is used to return a list of movies that were released between two given years
-     * Key concept used is "Stream", for processing the list cleanly
-     * filter() to select only movies within the year range
-     * toList() converts the result back to a list
-     * @param movies (full list of movie objects to filter)
-     * @param startYear (the earliest release year to include)
-     * @param endYear (the latest release year to include)
-     * @return List (filtered list of movies released in the specific range)
-     */
-    List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear)
-    {
-
-        Stream<Movie> movieStream = movies.stream();
-
-        movies = movieStream
-                .filter(m -> m.getReleaseYear() >= startYear && m.getReleaseYear()<= endYear)
-                .toList();
-
-        return movies;
-    }
 
     @Override
     public void onAddWatchlistClicked(Movie movie)

@@ -1,8 +1,7 @@
-package at.ac.fhcampuswien.fhmdb.dataLayer;
+package at.ac.fhcampuswien.fhmdb.dataLayer.database;
 
-import at.ac.fhcampuswien.fhmdb.models.Genre;
-import at.ac.fhcampuswien.fhmdb.models.Movie;
-import com.j256.ormlite.dao.BaseDaoImpl;
+import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;

@@ -1,9 +1,8 @@
 package at.ac.fhcampuswien.fhmdb.ui;
 
 import at.ac.fhcampuswien.fhmdb.HomeController;
-import at.ac.fhcampuswien.fhmdb.models.Movie;
+import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -16,6 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MovieCell extends ListCell<Movie> {
     private final Label title = new Label();
@@ -33,13 +34,15 @@ public class MovieCell extends ListCell<Movie> {
 
     private final VBox textLayout = new VBox(title, detail, genres, releaseYear, rating, lengthInMinutes, mainCast, directors, writers);
     private final ImageView posterView = new ImageView();
-    private final HBox buttonsHbox = new HBox(showDetailsBtn, addWatchlistBtn,removeWatchlistBtn);
-    private final HBox layout = new HBox(/*posterView,*/ textLayout,buttonsHbox);
+    private final VBox buttonsHbox = new VBox(showDetailsBtn, addWatchlistBtn,removeWatchlistBtn);
+    private final HBox layout = new HBox(posterView, textLayout,buttonsHbox);
     //private final MovieCellActionHandler actionHandler;
 
     private final AddWatchlistHandler addHandler;
     private final ShowDetailsHandler detailsHandler;
     private final RemoveWatchlistHandler removeHandler;
+
+    private static final Map<String, Image> imageCache = new HashMap<>();
 
     @Override
     protected void updateItem(Movie movie, boolean empty) {
@@ -64,11 +67,10 @@ public class MovieCell extends ListCell<Movie> {
 
             // Load image
             if (movie.getImgUrl() != null && !movie.getImgUrl().isEmpty()) {
-                Image posterImage = new Image(movie.getImgUrl(), true);
+                Image posterImage = imageCache.computeIfAbsent(movie.getImgUrl(), url -> new Image(url, true));
                 posterView.setImage(posterImage);
                 posterView.setFitWidth(100);
                 posterView.setFitHeight(150);
-                //posterView.setPreserveRatio(true);
             } else {
                 posterView.setImage(null);
                 posterView.setFitWidth(100);
@@ -84,18 +86,22 @@ public class MovieCell extends ListCell<Movie> {
             writers.getStyleClass().add("text-white");
             directors.getStyleClass().add("text-white");
             lengthInMinutes.getStyleClass().add("text-white");
-            addWatchlistBtn.getStyleClass().add("backgroud-yellow");
-            showDetailsBtn.getStyleClass().add("backgroud-yellow");
+            addWatchlistBtn.getStyleClass().add("background-yellow");
+            showDetailsBtn.getStyleClass().add("background-yellow");
 
 
             textLayout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
             textLayout.setPadding(new Insets(10));
             textLayout.setSpacing(10);
             textLayout.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            textLayout.setPrefWidth(610); // Adjust as needed
+            textLayout.setMinWidth(610);
+            textLayout.setMaxWidth(610);
 
             layout.setSpacing(3); // Space between image and text
             layout.setPadding(new Insets(10));
             layout.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
 
             if (!HomeController.buttonsVisible) {
                 showWatchlistButtons();

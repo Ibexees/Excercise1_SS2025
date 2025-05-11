@@ -1,6 +1,6 @@
-package at.ac.fhcampuswien.fhmdb.models;
+package at.ac.fhcampuswien.fhmdb.logic.models;
 
-import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieEntity;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.*;
