@@ -79,11 +79,16 @@ public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werd
     }
 
     private static void createTables() throws SQLException {
+
         TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
         TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
     }
 
     private static void createConnectionSource() throws SQLException {
-        connectionSource = new JdbcConnectionSource(DB_URL, user, password);
+        try {
+            connectionSource = new JdbcConnectionSource(DB_URL, user, password);
+        }catch (SQLException e){
+            throw new DataBaseException("Failed to create connection source", e);
+        }
     }
 }

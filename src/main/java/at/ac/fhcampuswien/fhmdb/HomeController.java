@@ -191,8 +191,10 @@ public class HomeController implements Initializable, MovieCellActionHandler
             movieRepository.removeAll();
             movieRepository.addAllMovies(allMovies);
             initializeWatchlistFromDB();
-        } catch (SQLException e) {
-            //showDatabaseErrorDialog(e);
+        } catch (DataBaseException e) {
+            showErrorDialog("Database error", "failed to load movies" );
+        } catch (Exception e) {
+            showErrorDialog("Unknown error", "unexpected error occured" );
         }
     }
 
@@ -532,7 +534,10 @@ public class HomeController implements Initializable, MovieCellActionHandler
             {
                 watchlistRepository.addToWatchlist(new WatchlistMovieEntity(movie));
             } catch (SQLException | DataBaseException e){
-                e.printStackTrace();
+                showErrorDialog("Database Error", "failed to add movie to watchlist");
+
+            } catch (Exception e) {
+                showErrorDialog("unexpected error", "unexcepted error occured");
             }
         }
         else
@@ -555,23 +560,30 @@ public class HomeController implements Initializable, MovieCellActionHandler
         boolean movieInList = watchListMovies.stream().
                 anyMatch(contain -> contain.equals(movie));
 
-        if(movieInList)
-        {
+        if (movieInList) {
             watchListMovies.remove(movie);
-            try
-            {
+            try {
                 watchlistRepository.removeFromWatchlist(movie.getId());
-            } catch (SQLException e)
-            {
-                //TODO: GUI Exceptionhandling
-                throw new RuntimeException(e);
+                showErrorDialog("Success", "Movie successfully removed from watchlist!");
+            } catch (DataBaseException e) {
+                showErrorDialog("Database Error", "Failed to remove movie from watchlist: " + e.getMessage());
+            } catch (Exception e) {
+                showErrorDialog("Unexpected Error", "An unexpected error occurred while removing from the watchlist: " + e.getMessage());
             }
-            System.out.println("Movie removed from Watchlist");
-        }
-        else
-        {
-            System.out.println("Movie does not exist");
+        } else {
+            showErrorDialog("Info", "Movie is not in the watchlist.");
         }
     }
 
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }
+
+
+
