@@ -6,6 +6,7 @@ import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.Rating;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListView;
@@ -14,10 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.api.FxRobot;
 
@@ -95,28 +94,29 @@ class HomeControllerTest {
     @Test //Nancy
     public void title_filter_not_case_sensitive() throws SQLException {
         HomeController homeController = new HomeController(); //homecontroller instanz erzeugen, für filterung von filmen
-        homeController.allMovies = Arrays.asList( // testfilme mit 2 versionen
-                    new Movie("The Dark Knight","Action movie",Arrays.asList(Genre.ACTION)),
-                    new Movie("the dark knight","The battle between batman and joker",Arrays.asList(Genre.ACTION)),
-                    new Movie("willy wonka and the chocolate factory","Fantasy movie",Arrays.asList(Genre.FANTASY)),
-                    new Movie("Willy Wonka And The Chocolate Factory","Get the golden ticket",Arrays.asList(Genre.FANTASY)),
-                    new Movie("SCARFACE","The Life of Tony Montana",Arrays.asList(Genre.THRILLER)),
-                    new Movie("scarface","Thriller",Arrays.asList(Genre.THRILLER)),
-                    new Movie("Superbad","McLovin",Arrays.asList(Genre.COMEDY)),
-                    new Movie("SUPERBAD","Comedy Movie",Arrays.asList(Genre.COMEDY))
-            );
 
-            // suche nach the dark knight, simuliert benutzereingabe
-        String searchQuery ="the dark knight";
-        List<Movie> resultDarkKnight =homeController.filterMovies(null,"the dark knight"); // methode filterMovies aufgerufen, genre auf null, suchtext,
+        List<Movie> testMovies = Arrays.asList( // testfilme mit 2 versionen
+                new Movie("The Dark Knight","Action movie",Arrays.asList(Genre.ACTION)),
+                new Movie("the dark knight","The battle between batman and joker",Arrays.asList(Genre.ACTION)),
+                new Movie("willy wonka and the chocolate factory","Fantasy movie",Arrays.asList(Genre.FANTASY)),
+                new Movie("Willy Wonka And The Chocolate Factory","Get the golden ticket",Arrays.asList(Genre.FANTASY)),
+                new Movie("SCARFACE","The Life of Tony Montana",Arrays.asList(Genre.THRILLER)),
+                new Movie("scarface","Thriller",Arrays.asList(Genre.THRILLER)),
+                new Movie("Superbad","McLovin",Arrays.asList(Genre.COMEDY)),
+                new Movie("SUPERBAD","Comedy Movie",Arrays.asList(Genre.COMEDY))
+        );
 
+        // suche nach the dark knight, simuliert benutzereingabe
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("query", "the dark knight");
+
+        // Use filterMovies method directly
+        List<Movie> resultDarkKnight = homeController.filterMovies(testMovies, parameters);
 
         //erwartete Anzahl an Treffern
         assertEquals(2, resultDarkKnight.size());
         assertTrue(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("The Dark Knight"))); //überflüssig? weil in der ersten Zeile werden schon 2 filme ausgespuckt
         assertFalse(resultDarkKnight.stream().anyMatch(movie -> movie.getTitle().equalsIgnoreCase("Superbad"))); //braucht man diese Zeile Robuster aber Logik ?
-
-
     }
 
     @Test //Iyobosa
@@ -127,16 +127,18 @@ class HomeControllerTest {
         testMovies.add(new Movie("Kung Fu Panda","Action movie",Arrays.asList(Genre.ACTION)));
         testMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
 
-        homeController.allMovies = testMovies; //von Elias
-
         String searchText = "Kung";
 
-        List<Movie> filteredMovies = homeController.filterMovies(null, searchText);
+        // Create parameters for filtering
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("query", searchText);
+
+        // Use filterMovies method directly
+        List<Movie> filteredMovies = homeController.filterMovies(testMovies, parameters);
 
         assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein");
         assertEquals(filteredMovies.size(),1, "Es sollte genau ein Film mit 'Name' im Titel gefunden werden");
         assertEquals("Kung Fu Panda", filteredMovies.get(0).getTitle(), "Der gefundene Film sollte 'Kung Fu Panda' sein");
-
     }
 
 
@@ -152,18 +154,23 @@ class HomeControllerTest {
         testMovies.add(new Movie("Batman", "Joker", Arrays.asList(Genre.DOCUMENTARY,Genre.SCIENCE_FICTION)));
         testMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
 
-        homeController.allMovies = testMovies;
-
         //Nach Genre.ACTION filtern
         Genre testGenre = Genre.ACTION;
 
-        //Die gefilterten Filme vom HomeController erhalten.
-        List<Movie> filteredMovies = homeController.filterMovies(testGenre,"");
+        // Create parameters for filtering
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("genre", testGenre.toString());
+
+        // Use filterMovies method directly
+        List<Movie> filteredMovies = homeController.filterMovies(testMovies, parameters);
 
         assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein.");
         assertEquals(filteredMovies.size(),2, "Es sollten genau zwei Filme mit [ACTION] gefunden werden.");
-        assertEquals("The Dark Knight", filteredMovies.get(0).getTitle(), "The Dark Knight ist [ACTION] Genre.");
-        assertEquals("Into the Spiderverse", filteredMovies.get(1).getTitle(), "Into the Spiderverse ist [ACTION] Genre.");
+
+        // Sort for consistent testing
+        filteredMovies.sort(Comparator.comparing(Movie::getTitle));
+        assertEquals("Into the Spiderverse", filteredMovies.get(0).getTitle(), "Into the Spiderverse ist [ACTION] Genre.");
+        assertEquals("The Dark Knight", filteredMovies.get(1).getTitle(), "The Dark Knight ist [ACTION] Genre.");
     }
 
     @Test //Elias
@@ -178,17 +185,23 @@ class HomeControllerTest {
         testMovies.add(new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
         testMovies.add(new Movie("The Dark Knight Rises", "Bane", Arrays.asList(Genre.ACTION)));
 
-        homeController.allMovies = testMovies;
-
         //Nach Genre.ACTION & "Knight" filtern
         Genre testGenre = Genre.ACTION;
         String searchText = "Knight";
 
-        //Die gefilterten Filme vom HomeController erhalten.
-        List<Movie> filteredMovies = homeController.filterMovies(testGenre,searchText);
+        // Create parameters for filtering
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("genre", testGenre.toString());
+        parameters.put("query", searchText);
+
+        // Use filterMovies method directly
+        List<Movie> filteredMovies = homeController.filterMovies(testMovies, parameters);
 
         assertFalse(filteredMovies.isEmpty(), "Die gefilterte Liste sollte nicht leer sein.");
         assertEquals(filteredMovies.size(),2, "Es sollten genau zwei Filme mit [ACTION] & den Namen \"Knight\" beinhalten.");
+
+        // Sort for consistent testing
+        filteredMovies.sort(Comparator.comparing(Movie::getTitle));
         assertEquals("The Dark Knight", filteredMovies.get(0).getTitle(), "The Dark Knight ist [ACTION] Genre & der gesuchte String ist enthalten.");
         assertEquals("The Dark Knight Rises", filteredMovies.get(1).getTitle(), "The Dark Knight Rises ist [ACTION] Genre & der gesuchte String ist enthalten.");
     }

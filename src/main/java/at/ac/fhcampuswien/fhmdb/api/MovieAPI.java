@@ -20,11 +20,11 @@ public class MovieAPI {
      * @param params a key-value pair map used to add query parameters to the URL
      * @return the JSON response as a String
      * @throws IOException   if a network or I/O error occurs during the request
-     * @throws ApiException  if the API responds with a non-successful HTTP status code
+     * @throws MovieAPIException  if the API responds with a non-successful HTTP status code
      */
 
-    public static String getMovies(Map<String, String> params) throws ApiException, IOException {
-        String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
+    public static String getMovies(Map<String, String> params) throws MovieAPIException, IOException {
+        String apiUrl = "https://prog2.fh-campuswien.ac.at/moviess";
         String fullUrl = buildUrlWithParams(apiUrl, params);
         HttpURLConnection connection = createHttpConnection(fullUrl);
         return readResponse(connection);
@@ -44,7 +44,7 @@ public class MovieAPI {
         return urlBuilder.toString();
     }
 
-    private static HttpURLConnection createHttpConnection(String urlString) throws ApiException, IOException {
+    private static HttpURLConnection createHttpConnection(String urlString) throws MovieAPIException, IOException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -53,7 +53,7 @@ public class MovieAPI {
         int responseCode = connection.getResponseCode();
 
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw new ApiException("HTTP Request zur Movie API failed: " + responseCode);
+            throw new MovieAPIException("HTTP Request to Movie API failed: " + responseCode);
         }
 
         return connection;

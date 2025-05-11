@@ -1,14 +1,8 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
-import at.ac.fhcampuswien.fhmdb.api.ApiException;
-import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
-import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.*;
 
 public class Movie {
@@ -83,11 +77,7 @@ public class Movie {
         if(obj instanceof  Movie)
         {
             Movie movie = (Movie) obj;
-            if (this.getId().equals(movie.getId()))
-            {
-                return true;
-            }
-            else if (this.title.equals(movie.title))
+             if (this.title.equals(movie.title))
             {
                 return true;
             }
