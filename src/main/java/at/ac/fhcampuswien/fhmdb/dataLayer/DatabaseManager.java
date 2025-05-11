@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class DatabaseManager //Singleton Klasse kann nur einmal instanziert werden!
 {
-    public static final String DB_URL = "jdbc:h2:file: ./db/movieDB";
+    public static final String DB_URL = "jdbc:h2:file:./db/movieDB";
     public static final String user = "user";
     public static final String password = "pass";
 
