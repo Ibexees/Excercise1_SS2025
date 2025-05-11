@@ -67,34 +67,7 @@ public class Movie {
     }
 
 
-    public static List<Movie> initializeMovies(Map<String, String> parameters) {
-        List<Movie> movies = new ArrayList<>();
 
-        try {
-            // Fetch movies from the API
-            String apiResponse = MovieAPI.getMovies(parameters);
-            movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
-            System.out.println("Fetched movies from API.");
-        } catch (ApiException e) {
-            // Handle API exceptions
-            System.err.println("API failed: " + e.getMessage());
-            MovieRepository movieRepository = new MovieRepository();
-            try {
-                // Fallback: load movies from the database
-                movies = movieRepository.getAllMovies();
-                System.out.println("Loaded movies from database fallback.");
-            } catch (SQLException dbException) {
-                // Handle SQL exceptions if database loading fails
-                System.err.println("Database loading failed: " + dbException.getMessage());
-                // Return an empty list or handle as necessary
-            }
-        } catch (IOException e) {
-            // Handle other IO exceptions (like network failure)
-            throw new RuntimeException("Failed to initialize movies: " + e.getMessage(), e);
-        }
-
-        return movies;
-    }
 
 
     @Override

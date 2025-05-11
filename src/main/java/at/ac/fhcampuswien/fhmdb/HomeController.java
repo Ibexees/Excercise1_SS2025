@@ -1,5 +1,8 @@
 package at.ac.fhcampuswien.fhmdb;
 
+import at.ac.fhcampuswien.fhmdb.api.ApiException;
+import at.ac.fhcampuswien.fhmdb.api.Deserializer;
+import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.dataLayer.DataBaseException;
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.dataLayer.WatchlistMovieEntity;
@@ -24,6 +27,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -67,7 +71,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
     private BooleanProperty isFiltered = new SimpleBooleanProperty(false);
 
     private Map<String,String> parameters = new HashMap<>();
-    public List<Movie> allMovies = Movie.initializeMovies(parameters);
+    public List<Movie> allMovies;
     public ObservableList<Movie> watchListMovies = FXCollections.observableArrayList();
     private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
@@ -183,13 +187,47 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
     private void loadMoviesFromAPIAndCache() {
         try {
-            allMovies = Movie.initializeMovies(parameters);
+            allMovies = initializeMovies(parameters);
             movieRepository.removeAll();
             movieRepository.addAllMovies(allMovies);
             initializeWatchlistFromDB();
         } catch (SQLException e) {
             //showDatabaseErrorDialog(e);
         }
+    }
+
+    public static List<Movie> initializeMovies(Map<String, String> parameters) {
+        List<Movie> movies = new ArrayList<>();
+
+        try {
+            // Fetch movies from the API
+            String apiResponse = MovieAPI.getMovies(parameters);
+            movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
+            System.out.println("Fetched movies from API.");
+        } catch (ApiException e) {
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("API Error");
+            alert.setHeaderText("Failed to fetch movies from API");
+            alert.setContentText(e.getMessage());
+            alert.show();
+
+            System.err.println("API failed: " + e.getMessage());
+
+            MovieRepository movieRepository = new MovieRepository();
+            try {
+                // Fallback
+                movies = movieRepository.getAllMovies();
+                System.out.println("Loaded movies from database fallback.");
+            } catch (SQLException dbException) {
+                System.err.println("Database loading failed: " + dbException.getMessage());
+            }
+        } catch (IOException e) {
+
+            throw new RuntimeException("Failed to initialize movies: " + e.getMessage(), e);
+        }
+
+        return movies;
     }
 
     private void setupInitialUIState() {
@@ -222,7 +260,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
             try {
                 handleReset(event);
             } catch (SQLException e) {
-                //showDatabaseErrorDialog(e);
+                showDatabaseErrorDialog(e);
             }
         });
 
@@ -230,20 +268,20 @@ public class HomeController implements Initializable, MovieCellActionHandler
             try {
                 handleReset(event);
             } catch (SQLException e) {
-                //showDatabaseErrorDialog(e);
+                showDatabaseErrorDialog(e);
             }
         });
 
         watchlistBtn.setOnAction(this::displayWatchList);
     }
-    /*
+
     private void showDatabaseErrorDialog(SQLException e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Database Error");
         alert.setHeaderText("An error occurred while accessing the database.");
         alert.setContentText(e.getMessage());
     }
-*/
+
     private void setupResetListener() {
         isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
     }
@@ -284,7 +322,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
     private void handleReset(ActionEvent actionEvent) throws SQLException {
         buttonsVisible = true;
         observableMovies.clear();
-        allMovies = FXCollections.observableArrayList(Movie.initializeMovies(null));
+        allMovies = FXCollections.observableArrayList(initializeMovies(null));
         observableMovies.addAll(allMovies);
         movieListView.setItems(observableMovies);
 
@@ -344,7 +382,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
             // New Filter handled by API
             ObservableList<Movie> filteredMoviesByAPI =
-                    FXCollections.observableArrayList(Movie.initializeMovies(parameters));
+                    FXCollections.observableArrayList(initializeMovies(parameters));
             observableMovies = filteredMoviesByAPI;
 
             movieListView.setItems(observableMovies);
