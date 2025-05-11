@@ -1,6 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 
-import at.ac.fhcampuswien.fhmdb.api.ApiException;
+import at.ac.fhcampuswien.fhmdb.api.MovieAPIException;
 import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.dataLayer.DataBaseException;
@@ -16,6 +16,7 @@ import at.ac.fhcampuswien.fhmdb.ui.MovieCellActionHandler;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -26,6 +27,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 
 import java.io.IOException;
 import java.net.URL;
@@ -73,11 +75,10 @@ public class HomeController implements Initializable, MovieCellActionHandler
     private Map<String,String> parameters = new HashMap<>();
     public List<Movie> allMovies;
     public ObservableList<Movie> watchListMovies = FXCollections.observableArrayList();
-    private ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
+    public ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
     private MovieRepository movieRepository = new MovieRepository();
     private WatchlistRepository watchlistRepository = new WatchlistRepository();
-
 
     private boolean asc;
 
@@ -200,29 +201,35 @@ public class HomeController implements Initializable, MovieCellActionHandler
         List<Movie> movies = new ArrayList<>();
 
         try {
-            // Fetch movies from the API
+            // Fetch movies von API
             String apiResponse = MovieAPI.getMovies(parameters);
             movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
             System.out.println("Fetched movies from API.");
-        } catch (ApiException e) {
+        } catch (MovieAPIException e) {
 
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("API Error");
-            alert.setHeaderText("Failed to fetch movies from API");
-            alert.setContentText(e.getMessage());
-            alert.show();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("API Error");
+                alert.setHeaderText("Failed to fetch movies from API");
+                alert.setContentText(e.getMessage());
+                alert.initModality(Modality.APPLICATION_MODAL);
+
+                alert.showAndWait();
+            });
 
             System.err.println("API failed: " + e.getMessage());
 
             MovieRepository movieRepository = new MovieRepository();
             try {
-                // Fallback
+                // Fallback: Movies von Database holen
+
                 movies = movieRepository.getAllMovies();
+
                 System.out.println("Loaded movies from database fallback.");
             } catch (SQLException dbException) {
                 System.err.println("Database loading failed: " + dbException.getMessage());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
 
             throw new RuntimeException("Failed to initialize movies: " + e.getMessage(), e);
         }
@@ -352,65 +359,112 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
     }
 
-    /**handles set Parameters and Filters movie List accordingly*/
     private void handleFilter(ActionEvent actionEvent) {
-        System.out.println("Filter Button pressed");
-        String searchText = "";
-        Genre genre = null;
-        Rating param;
-        parameters = new HashMap<>();
 
-        if (searchField.getText() != null) {
-            searchText = searchField.getText();
-            parameters.put("query", searchText);
+        // Clear previous filtered results
+        observableMovies.clear();
+
+        // Prepare filter parameters
+        Map<String, String> parameters = new HashMap<>();
+
+        if (searchField.getText() != null && !searchField.getText().isEmpty()) {
+            parameters.put("query", searchField.getText());
         }
 
         if (genreComboBox.getSelectionModel().getSelectedItem() != null) {
-            genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
+            Genre genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
             parameters.put("genre", genre.toString());
         }
 
         if (ratingComboBox.getSelectionModel().getSelectedItem() != null) {
-            param = Rating.valueOf(ratingComboBox.getSelectionModel().getSelectedItem().toString());
-            parameters.put("ratingFrom", Integer.toString(param.getRating()));
+            Rating rating = Rating.valueOf(ratingComboBox.getSelectionModel().getSelectedItem().toString());
+            parameters.put("ratingFrom", Integer.toString(rating.getRating()));
         }
 
-        if (yearField.getText() != null) {
-            parameters.put("releaseYear", yearField.getText());
-        }
+        if (yearField.getText() != null && !yearField.getText().isEmpty()) {
+            try {
+                Integer.parseInt(yearField.getText()); // Prüfen, ob es eine Nummer ist
+                parameters.put("releaseYear", yearField.getText());
+            } catch (NumberFormatException e) {
 
+                throw new NumberFormatException("Invalid year");
 
-            // New Filter handled by API
-            ObservableList<Movie> filteredMoviesByAPI =
-                    FXCollections.observableArrayList(initializeMovies(parameters));
-            observableMovies = filteredMoviesByAPI;
-
-            movieListView.setItems(observableMovies);
-            movieListView.refresh();
-            isFiltered.set(true);
-
-    }
-
-    //Not in use anymore, handled by API
-    public List<Movie> filterMovies(Genre genres, String searchText)
-    {
-        ObservableList<Movie> filteredObservableMovies = FXCollections.observableArrayList();
-
-        for (Movie movie : allMovies) {
-            if(movie.getGenres().contains(genres)||genres == null) {
-                if (searchText.isEmpty()) {
-                    filteredObservableMovies.add(movie);
-                }
-                else {
-                    if (movie.getTitle().toLowerCase().contains(searchText.toLowerCase())) {
-                        filteredObservableMovies.add(movie);
-                    }
-                    else continue;
-                }
             }
         }
 
-        return filteredObservableMovies;
+        try {
+
+            if (!parameters.isEmpty()) {
+                System.out.println("Attempting to use API for filtering with parameters: " + parameters);
+                // Zuerst mit der API versuchen zu filtern.
+                try {
+
+                    String apiResponse = MovieAPI.getMovies(parameters);
+                    List<Movie> filteredMovies = Deserializer.deserializeJsonToMovieModel(apiResponse);
+                    observableMovies.addAll(filteredMovies);
+                    System.out.println("Successfully filtered via API, found " + filteredMovies.size() + " movies");
+                } catch (MovieAPIException e) {
+                    System.out.println("API filtering failed: " + e.getMessage());
+                    // Daten aus der Database holen und local filtern.
+                    performLocalFiltering(parameters);
+                }
+            } else {
+                observableMovies.addAll(allMovies);
+            }
+
+            // Update UI
+            movieListView.setItems(observableMovies);
+            movieListView.refresh();
+            isFiltered.set(!parameters.isEmpty());
+
+        } catch (Exception e) {
+            System.err.println("Filtering failed: " + e.getMessage());
+        }
+    }
+
+    public void performLocalFiltering(Map<String, String> parameters) throws SQLException {
+        List<Movie> moviesToFilter;
+
+        moviesToFilter = movieRepository.getAllMovies();
+        System.out.println(moviesToFilter.size() + " movies from database loaded");
+
+
+        // Apply filtering
+        List<Movie> filteredMovies = filterMovies(moviesToFilter, parameters);
+
+        // Clear and update observable list
+        observableMovies.clear();
+        observableMovies.addAll(filteredMovies);
+    }
+
+    public List<Movie> filterMovies(List<Movie> movies, Map<String, String> parameters) {
+        // Parameter rausholen
+        String searchText = parameters.getOrDefault("query", "");
+        Genre genre = parameters.containsKey("genre") ? Genre.valueOf(parameters.get("genre")) : null;
+        Integer ratingFrom = parameters.containsKey("ratingFrom") ? Integer.parseInt(parameters.get("ratingFrom")) : null;
+        String releaseYear = parameters.getOrDefault("releaseYear", "");
+
+        //nach Parametern filtern
+        return movies.stream()
+                .filter(movie -> {
+                    // Search text filter
+                    boolean matchesSearchText = searchText.isEmpty() ||
+                            movie.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
+                            movie.getDescription().toLowerCase().contains(searchText.toLowerCase());
+
+                    // Genre filter
+                    boolean matchesGenre = genre == null || movie.getGenres().contains(genre);
+
+                    // Rating filter
+                    boolean matchesRating = ratingFrom == null || movie.getRating() >= ratingFrom;
+
+                    // Release year filter
+                    boolean matchesReleaseYear = releaseYear.isEmpty() ||
+                            Integer.toString(movie.getReleaseYear()).equals(releaseYear);
+
+                    return matchesSearchText && matchesGenre && matchesRating && matchesReleaseYear;
+                })
+                .collect(Collectors.toList());
     }
 
     public void controlResetButton() {

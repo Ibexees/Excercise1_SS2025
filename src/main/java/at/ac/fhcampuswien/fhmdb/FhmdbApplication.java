@@ -40,7 +40,6 @@ public class FhmdbApplication extends Application {
             System.err.println("Error during application start");
             throw new DataBaseException("unexpected startup error");
         }
-
     }
 
     public static void main(String[] args) {
