@@ -47,7 +47,7 @@ public class MovieRepository
                 .where()
                 .eq("apiID", apiID)
                 .query();
-        System.out.println(MovieEntity.toMovies(result).get(0));
+        //System.out.println(MovieEntity.toMovies(result).get(0));
         return MovieEntity.toMovies(result).get(0);
     }
 

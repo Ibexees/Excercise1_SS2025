@@ -46,8 +46,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void movies_sorted_by_title_asc()
-    {
+    public void movies_sorted_by_title_asc() throws SQLException {
         List<Movie> sortedMovies = new ArrayList<>();
         sortedMovies.add(new Movie ("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION,Genre.SCIENCE_FICTION)));
         sortedMovies.add(new Movie ("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY,Genre.ACTION)));
@@ -70,8 +69,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void movies_sorted_by_title_desc()
-    {
+    public void movies_sorted_by_title_desc() throws SQLException {
         List<Movie> sortedMovies = new ArrayList<>();
         sortedMovies.add(new Movie("Your Name","Coming of Age romance",Arrays.asList(Genre.ROMANCE,Genre.DRAMA)));
         sortedMovies.add(new Movie ("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY,Genre.ACTION)));
@@ -95,7 +93,7 @@ class HomeControllerTest {
     }
 
     @Test //Nancy
-    public void title_filter_not_case_sensitive() {
+    public void title_filter_not_case_sensitive() throws SQLException {
         HomeController homeController = new HomeController(); //homecontroller instanz erzeugen, für filterung von filmen
         homeController.allMovies = Arrays.asList( // testfilme mit 2 versionen
                     new Movie("The Dark Knight","Action movie",Arrays.asList(Genre.ACTION)),
@@ -122,7 +120,7 @@ class HomeControllerTest {
     }
 
     @Test //Iyobosa
-    public void title_filter_accepts_substring_of_Movie_title(){
+    public void title_filter_accepts_substring_of_Movie_title() throws SQLException {
         HomeController homeController = new HomeController();
 
         List<Movie> testMovies = new ArrayList<>();
@@ -143,7 +141,7 @@ class HomeControllerTest {
 
 
     @Test //Elias
-    public void only_genre_filtered_Movies_displayed()
+    public void only_genre_filtered_Movies_displayed() throws SQLException
     {
         HomeController homeController = new HomeController();
 
@@ -169,7 +167,7 @@ class HomeControllerTest {
     }
 
     @Test //Elias
-    public void only_genre_and_title_filtered_movies_displayed()
+    public void only_genre_and_title_filtered_movies_displayed() throws SQLException
     {
         HomeController homeController = new HomeController();
 
@@ -196,7 +194,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void return_only_most_popular_Actor()
+    public void return_only_most_popular_Actor() throws SQLException
     {
         HomeController homeController = new HomeController();
         List<Movie> sortedMovies = new ArrayList<>();
@@ -217,7 +215,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void return_multiple_most_popular_Actors()
+    public void return_multiple_most_popular_Actors() throws SQLException
     {
         HomeController homeController = new HomeController();
         List<Movie> sortedMovies = new ArrayList<>();
@@ -238,7 +236,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void no_most_popular_Actor_returned()
+    public void no_most_popular_Actor_returned() throws SQLException
     {
         HomeController homeController = new HomeController();
         List<Movie> sortedMovies = new ArrayList<>();
@@ -259,7 +257,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void only_movies_between_years_returned()
+    public void only_movies_between_years_returned() throws SQLException
     {
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
@@ -282,7 +280,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void no_movies_between_years_returned()
+    public void no_movies_between_years_returned() throws SQLException
     {
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
@@ -300,7 +298,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void no_movies_release_year_set()
+    public void no_movies_release_year_set() throws SQLException
     {
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
@@ -321,7 +319,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void getLongestMovieTitle(){
+    public void getLongestMovieTitle() throws SQLException {
         HomeController homeController = new HomeController();// neues homecontroller objekt erstellt
         List<Movie> movies = new ArrayList<>(); // leere liste vom typ movie erzeugt
         movies.add(new Movie("Southpaw", "Boxen", Arrays.asList(Genre.ROMANCE,Genre.DRAMA))); // liste wird mit 3 filmobjekten gefüllt
@@ -333,7 +331,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void getLongestMovieTitle_emptyList(){
+    public void getLongestMovieTitle_emptyList() throws SQLException {
         HomeController homeController = new HomeController(); // neues homecontroller objekt
         List<Movie> movies = new ArrayList<>();// leere liste vom typ movies wird erstellt
 
@@ -342,7 +340,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void test_CountMoviesFrom_givenDirector_returnCorrectCount() { //for a particular director
+    public void test_CountMoviesFrom_givenDirector_returnCorrectCount() throws SQLException { //for a particular director
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
 
@@ -367,7 +365,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void test_CountMoviesFrom_wrongDirector_returnCorrectCount() { //for wrong director
+    public void test_CountMoviesFrom_wrongDirector_returnCorrectCount() throws SQLException { //for wrong director
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
 
@@ -391,7 +389,7 @@ class HomeControllerTest {
     }
 
     @Test
-    public void test_CountMoviesFrom_noDirector_returnCorrectCount() { // no director at all
+    public void test_CountMoviesFrom_noDirector_returnCorrectCount() throws SQLException { // no director at all
         HomeController homeController = new HomeController();
         List<Movie> movies = new ArrayList<>();
 
