@@ -162,6 +162,7 @@ public class HomeControllerFXTest extends ApplicationTest
         // Prüfen, ob die Reihenfolge korrekt ist
         assertEquals("The Godfather", DisplayedMovies.get(0).getTitle());
     }
+
 }
 
 

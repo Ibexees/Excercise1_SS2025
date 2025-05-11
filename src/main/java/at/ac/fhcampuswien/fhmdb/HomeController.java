@@ -573,4 +573,5 @@ public class HomeController implements Initializable, MovieCellActionHandler
             System.out.println("Movie does not exist");
         }
     }
+
 }
