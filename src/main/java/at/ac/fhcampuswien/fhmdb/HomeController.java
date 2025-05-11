@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
@@ -76,6 +77,9 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
     private boolean asc;
 
+    public HomeController() throws SQLException {
+    }
+
     private void initializeWatchlistFromDB() throws SQLException
     {
         List<WatchlistMovieEntity> dbWatchlist = watchlistRepository.getWatchlist();
@@ -95,29 +99,17 @@ public class HomeController implements Initializable, MovieCellActionHandler
         return;
     }
 
+    /*
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Boolean internetConnection = false;
-        try
-        {
-            if(internetConnection)
-            {
-                movieRepository.removeAll();
-                movieRepository.addAllMovies(allMovies);
-                initializeWatchlistFromDB();
-                //allMovies.clear();
-                //allMovies.add(movieRepository.getMovie("86642997-ee66-4102-ade1-54941a1d3a6e")); //Inception 86642997-ee66-4102-ade1-54941a1d3a6e
-            }
-            else
-            {
-                allMovies.clear();
-                allMovies = movieRepository.getAllMovies();
-                initializeWatchlistFromDB();
-            }
-
-        } catch (SQLException e)
-        {
-            throw new RuntimeException(e);//TODO: GUI Exception Handling!
+        try {
+            allMovies = Movie.initializeMovies(parameters);
+            movieRepository.removeAll(); // clear old DB data
+            movieRepository.addAllMovies(allMovies); // cache new movies
+            initializeWatchlistFromDB();
+        } catch (SQLException e) {
+            showDatabaseErrorDialog(e);
         }
 
         resetBtn.setDisable(true);
@@ -176,6 +168,102 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
 
     }
+*/
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        loadMoviesFromAPIAndCache();
+        setupInitialUIState();
+        setupMovieListView();
+        setupComboBoxes();
+        setupButtonHandlers();
+        setupSortButton();
+        setupResetListener();
+    }
+
+    private void loadMoviesFromAPIAndCache() {
+        try {
+            allMovies = Movie.initializeMovies(parameters);
+            movieRepository.removeAll();
+            movieRepository.addAllMovies(allMovies);
+            initializeWatchlistFromDB();
+        } catch (SQLException e) {
+            //showDatabaseErrorDialog(e);
+        }
+    }
+
+    private void setupInitialUIState() {
+        resetBtn.setDisable(true);
+        resetBtn.setVisible(false);
+        observableMovies.addAll(allMovies);
+    }
+
+    private void setupMovieListView() {
+        movieListView.setItems(observableMovies);
+        movieListView.setCellFactory(movieListView -> new MovieCell(
+                movie -> onAddWatchlistClicked(movie),
+                movie -> showMovieDetails(movie),
+                movie -> onRemoveWatchlistClicked(movie))
+        );
+    }
+
+    private void setupComboBoxes() {
+        genreComboBox.getItems().addAll(Genre.values());
+        genreComboBox.setPromptText("Filter by Genre");
+
+        ratingComboBox.getItems().addAll(Rating.values());
+        ratingComboBox.setPromptText("Filter by Rating and Above");
+    }
+
+    private void setupButtonHandlers() {
+        searchBtn.setOnAction(this::handleFilter);
+
+        resetBtn.setOnAction(event -> {
+            try {
+                handleReset(event);
+            } catch (SQLException e) {
+                //showDatabaseErrorDialog(e);
+            }
+        });
+
+        homeBtn.setOnAction(event -> {
+            try {
+                handleReset(event);
+            } catch (SQLException e) {
+                //showDatabaseErrorDialog(e);
+            }
+        });
+
+        watchlistBtn.setOnAction(this::displayWatchList);
+    }
+    /*
+    private void showDatabaseErrorDialog(SQLException e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Database Error");
+        alert.setHeaderText("An error occurred while accessing the database.");
+        alert.setContentText(e.getMessage());
+    }
+*/
+    private void setupResetListener() {
+        isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
+    }
+
+    private void setupSortButton() {
+        sortBtn.setOnAction(actionEvent -> {
+            asc = sortBtn.getText().equals("Sort (asc)");
+            allMovies = sortMovies(asc, allMovies);
+            observableMovies = FXCollections.observableArrayList(sortMovies(asc, observableMovies));
+
+            sortBtn.setText(asc ? "Sort (desc)" : "Sort (asc)");
+
+            movieListView.setItems(observableMovies);
+            movieListView.setCellFactory(movieListView -> new MovieCell(
+                    movie -> onAddWatchlistClicked(movie),
+                    movie -> showMovieDetails(movie),
+                    movie -> onRemoveWatchlistClicked(movie))
+            );
+        });
+    }
 
     private void displayWatchList(ActionEvent event)
     {
@@ -193,7 +281,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
     }
 
     /**Resets all Parameters and fetches all movies from the API*/
-    private void handleReset(ActionEvent actionEvent) {
+    private void handleReset(ActionEvent actionEvent) throws SQLException {
         buttonsVisible = true;
         observableMovies.clear();
         allMovies = FXCollections.observableArrayList(Movie.initializeMovies(null));
@@ -229,20 +317,19 @@ public class HomeController implements Initializable, MovieCellActionHandler
     /**handles set Parameters and Filters movie List accordingly*/
     private void handleFilter(ActionEvent actionEvent) {
         System.out.println("Filter Button pressed");
-        String searchText;
+        String searchText = "";
         Genre genre = null;
         Rating param;
         parameters = new HashMap<>();
 
-        if(searchField.getText() != null)
-        {
+        if (searchField.getText() != null) {
             searchText = searchField.getText();
-            parameters.put("query",searchText);
+            parameters.put("query", searchText);
         }
 
         if (genreComboBox.getSelectionModel().getSelectedItem() != null) {
             genre = Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem().toString());
-            parameters.put("genre",genre.toString());
+            parameters.put("genre", genre.toString());
         }
 
         if (ratingComboBox.getSelectionModel().getSelectedItem() != null) {
@@ -250,23 +337,20 @@ public class HomeController implements Initializable, MovieCellActionHandler
             parameters.put("ratingFrom", Integer.toString(param.getRating()));
         }
 
-        if(yearField.getText()!=null)
-        {
-            parameters.put("releaseYear",yearField.getText());
+        if (yearField.getText() != null) {
+            parameters.put("releaseYear", yearField.getText());
         }
 
-        //New Filter handled by API
-        ObservableList<Movie> filteredMoviesByAPI;
-        filteredMoviesByAPI =  FXCollections.observableArrayList(Movie.initializeMovies(parameters));
-        observableMovies = filteredMoviesByAPI;
 
-        //old Logic, now handled by API
-        //ObservableList<Movie> filteredMovies;
-        //filteredMovies = (ObservableList<Movie>) filterMovies(genre, searchText);
+            // New Filter handled by API
+            ObservableList<Movie> filteredMoviesByAPI =
+                    FXCollections.observableArrayList(Movie.initializeMovies(parameters));
+            observableMovies = filteredMoviesByAPI;
 
-        movieListView.setItems(observableMovies);
-        movieListView.refresh();
-        isFiltered.set(true);
+            movieListView.setItems(observableMovies);
+            movieListView.refresh();
+            isFiltered.set(true);
+
     }
 
     //Not in use anymore, handled by API

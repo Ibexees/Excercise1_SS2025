@@ -23,7 +23,7 @@ public class WatchlistRepository
 
     public List<WatchlistMovieEntity> getWatchlist() throws SQLException
     {
-        System.out.println(dao.queryForAll());
+        //System.out.println(dao.queryForAll());
         return dao.queryForAll();
     }
 

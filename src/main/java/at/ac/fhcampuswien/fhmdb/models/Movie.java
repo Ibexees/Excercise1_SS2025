@@ -4,9 +4,11 @@ import at.ac.fhcampuswien.fhmdb.api.ApiException;
 import at.ac.fhcampuswien.fhmdb.api.MovieAPI;
 import at.ac.fhcampuswien.fhmdb.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.dataLayer.MovieEntity;
+import at.ac.fhcampuswien.fhmdb.dataLayer.MovieRepository;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Movie {
@@ -65,20 +67,32 @@ public class Movie {
     }
 
 
-    public static List<Movie> initializeMovies(Map<String,String> parameters) throws RuntimeException {
+    public static List<Movie> initializeMovies(Map<String, String> parameters) {
         List<Movie> movies = new ArrayList<>();
 
-        String apiResponse;
-        Map<String, String> emptyParameters = new HashMap<>();
-
         try {
-            apiResponse = MovieAPI.getMovies(parameters);
-            //System.out.println(apiResponse);
+            // Fetch movies from the API
+            String apiResponse = MovieAPI.getMovies(parameters);
             movies = Deserializer.deserializeJsonToMovieModel(apiResponse);
-
-        } catch (IOException | ApiException e) {
+            System.out.println("Fetched movies from API.");
+        } catch (ApiException e) {
+            // Handle API exceptions
+            System.err.println("API failed: " + e.getMessage());
+            MovieRepository movieRepository = new MovieRepository();
+            try {
+                // Fallback: load movies from the database
+                movies = movieRepository.getAllMovies();
+                System.out.println("Loaded movies from database fallback.");
+            } catch (SQLException dbException) {
+                // Handle SQL exceptions if database loading fails
+                System.err.println("Database loading failed: " + dbException.getMessage());
+                // Return an empty list or handle as necessary
+            }
+        } catch (IOException e) {
+            // Handle other IO exceptions (like network failure)
             throw new RuntimeException("Failed to initialize movies: " + e.getMessage(), e);
         }
+
         return movies;
     }
 
