@@ -24,7 +24,7 @@ public class MovieAPI {
      */
 
     public static String getMovies(Map<String, String> params) throws MovieAPIException, IOException {
-        String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
+        String apiUrl = "https://prog2.fh-campuswien.ac.at/moviess";
         String fullUrl = buildUrlWithParams(apiUrl, params);
         HttpURLConnection connection = createHttpConnection(fullUrl);
         return readResponse(connection);

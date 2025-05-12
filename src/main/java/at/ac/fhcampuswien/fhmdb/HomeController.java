@@ -77,7 +77,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
     public ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
 
     public MovieRepository movieRepository;
-    private WatchlistRepository watchlistRepository = new WatchlistRepository();
+    private WatchlistRepository watchlistRepository;
 
     private MovieAnalysisService movieAnalysisService;
 
@@ -110,7 +110,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-            // Attempt to initialize everything
+            // Init der Movies
             loadMoviesFromAPIAndRefreshDatabase();
             setupInitialUIState();
             setupMovieListView();
@@ -427,7 +427,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
                 showErrorDialog("Database Error", "failed to add movie to watchlist");
 
             } catch (Exception e) {
-                showErrorDialog("unexpected error", "unexcepted error occured");
+                showErrorDialog("unexpected error", "unexpected error occured");
             }
         }
         else

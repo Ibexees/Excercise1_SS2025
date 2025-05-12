@@ -21,41 +21,41 @@ public class FhmdbApplication extends Application {
             stage.setScene(scene);
             stage.show();
         } catch (Exception e) {
-            e.printStackTrace();
-
-            //Root cause finden
-            Throwable cause = e;
-            while (cause.getCause() != null) {
-                cause = cause.getCause();
-            }
-
-            String errorMessage;
-            String title;
-
-            if (cause instanceof DataBaseException) {
-                title = "Database Error";
-                errorMessage = "Failed to connect to the database: " + cause.getMessage();
-            } else if (cause instanceof IOException) {
-                title = "File Error";
-                errorMessage = "Failed to access database file: " + cause.getMessage();
-            } else {
-                title = "Application Error";
-                errorMessage = "An unexpected error occurred: " + cause.getMessage();
-            }
-
-            final String finalTitle = title;
-            final String finalErrorMessage = errorMessage;
-
-
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(finalTitle);
-                alert.setHeaderText(null);
-                alert.setContentText(finalErrorMessage);
-                alert.showAndWait();
-                Platform.exit();
-            });
+            handleStartupException(e);
         }
+    }
+
+    private void handleStartupException(Exception e) {
+        e.printStackTrace();
+
+        // Root cause finden
+        Throwable cause = e;
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+
+        String title;
+        String errorMessage;
+
+        if (cause instanceof DataBaseException) {
+            title = "Database Error";
+            errorMessage = "Failed to connect to the database: " + cause.getMessage();
+        } else if (cause instanceof IOException) {
+            title = "File Error";
+            errorMessage = "Failed to access database file: " + cause.getMessage();
+        } else {
+            title = "Application Error";
+            errorMessage = "An unexpected error occurred: " + cause.getMessage();
+        }
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(errorMessage);
+            alert.showAndWait();
+            Platform.exit();
+        });
     }
 
     public static void main(String[] args) {
