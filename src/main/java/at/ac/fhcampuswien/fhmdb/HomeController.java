@@ -260,11 +260,6 @@ public class HomeController implements Initializable, MovieCellActionHandler
 
             sortState.sort(this);
 
-            movieListView.setCellFactory(movieListView -> new MovieCell(
-                    movie -> onAddWatchlistClicked(movie),
-                    movie -> showMovieDetails(movie),
-                    movie -> onRemoveWatchlistClicked(movie)));
-
         });
     }
 
