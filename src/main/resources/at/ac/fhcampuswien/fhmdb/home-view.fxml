@@ -42,7 +42,7 @@
 
    <HBox fx:id="upperHbox" spacing="5.0" styleClass="background-black" stylesheets="@styles.css">
       <children>
-         <JFXButton fx:id="sortBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Sort (asc)" />
+         <JFXButton fx:id="sortBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Unsorted" />
          <TextField fx:id="searchField" prefHeight="25.0" prefWidth="170.0" promptText="Search FHMDb" />
          <JFXComboBox fx:id="genreComboBox" focusColor="#f5c518" styleClass="filter-combo-box" stylesheets="@styles.css" />
          <TextField fx:id="yearField" prefHeight="25.0" prefWidth="170.0" promptText="Filter by releae year JJJJ" />

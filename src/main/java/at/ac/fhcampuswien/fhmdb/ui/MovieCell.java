@@ -131,8 +131,8 @@ public class MovieCell extends ListCell<Movie> {
 
     public void showHomeButtons() {
 
-        showDetailsBtn.setVisible(true);
-        showDetailsBtn.setManaged(true);
+        showDetailsBtn.setVisible(false);
+        showDetailsBtn.setManaged(false);
         addWatchlistBtn.setVisible(true);
         addWatchlistBtn.setManaged(true);
         removeWatchlistBtn.setVisible(false);

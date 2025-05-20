@@ -1,6 +1,7 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.DataBaseException;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.DatabaseManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class FhmdbApplication extends Application {
@@ -20,9 +22,20 @@ public class FhmdbApplication extends Application {
             stage.setTitle("FHMDb");
             stage.setScene(scene);
             stage.show();
-        } catch (Exception e) {
-            handleStartupException(e);
+
         }
+        catch(DataBaseException e)
+        {
+            System.out.println("HERE");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            //handleStartupException(e);
+        }
+       /* catch (Exception e) {
+            handleStartupException(e);
+        }*/
     }
 
     private void handleStartupException(Exception e) {

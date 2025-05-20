@@ -8,6 +8,8 @@ import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistMovieEntity;
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.logic.MovieAnalysisService;
+import at.ac.fhcampuswien.fhmdb.logic.NotSorted;
+import at.ac.fhcampuswien.fhmdb.logic.SortState;
 import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
 import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import at.ac.fhcampuswien.fhmdb.logic.MovieComparator;
@@ -80,8 +82,18 @@ public class HomeController implements Initializable, MovieCellActionHandler
     private WatchlistRepository watchlistRepository;
 
     private MovieAnalysisService movieAnalysisService;
-
+    private SortState sortState;
     private boolean asc;
+
+    public void setSortState(SortState sortState)
+    {
+        this.sortState = sortState;
+    }
+
+    public SortState getSortState()
+    {
+        return sortState;
+    }
 
     public HomeController() {
             movieAnalysisService = new MovieAnalysisService();
@@ -223,7 +235,9 @@ public class HomeController implements Initializable, MovieCellActionHandler
         isFiltered.addListener((observable, oldValue, newValue) -> controlResetButton());
     }
 
-    private void setupSortButton() {
+
+    //ersetzt durch SortState Pattern
+    /*private void setupSortButton() {
         sortBtn.setOnAction(actionEvent -> {
             asc = sortBtn.getText().equals("Sort (asc)");
             allMovies = sortMovies(asc, allMovies);
@@ -238,6 +252,30 @@ public class HomeController implements Initializable, MovieCellActionHandler
                     movie -> onRemoveWatchlistClicked(movie))
             );
         });
+    }*/
+    private void setupSortButton()
+    {
+        sortState = new NotSorted();
+        sortBtn.setOnAction(actionEvent -> {
+
+            sortState.sort(this);
+
+            movieListView.setCellFactory(movieListView -> new MovieCell(
+                    movie -> onAddWatchlistClicked(movie),
+                    movie -> showMovieDetails(movie),
+                    movie -> onRemoveWatchlistClicked(movie)));
+
+        });
+    }
+
+    public ObservableList<Movie> getObservableMovies()
+    {
+        return observableMovies;
+    }
+
+    public void setObservableMovies(ObservableList<Movie> observableMovies)
+    {
+        this.observableMovies = observableMovies;
     }
 
     private void displayWatchList(ActionEvent event)
@@ -317,7 +355,9 @@ public class HomeController implements Initializable, MovieCellActionHandler
                 parameters.put("releaseYear", yearField.getText());
             } catch (NumberFormatException e) {
 
-                throw new NumberFormatException("Invalid year");
+                //yearField.clear();
+                showErrorDialog("Info", "Invalid year in searchBox.");
+                //throw new NumberFormatException("Invalid year");
 
             }
         }
@@ -352,7 +392,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
         }
     }
 
-    public void performLocalFiltering(Map<String, String> parameters) throws SQLException {
+    public void performLocalFiltering(Map<String, String> parameters)  {
         List<Movie> moviesToFilter;
 
         moviesToFilter = movieRepository.getAllMovies();
