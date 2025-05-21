@@ -1,6 +1,7 @@
 package at.ac.fhcampuswien.fhmdb.dataLayer.database;
 
 import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
+import at.ac.fhcampuswien.fhmdb.ui.Observable;
 import com.j256.ormlite.dao.Dao;
 
 import java.sql.SQLException;

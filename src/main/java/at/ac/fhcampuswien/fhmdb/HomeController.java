@@ -37,7 +37,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HomeController implements Initializable, MovieCellActionHandler
+public class HomeController  implements Initializable, MovieCellActionHandler
 {
     @FXML
     public JFXButton searchBtn;
@@ -130,6 +130,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
             setupButtonHandlers();
             setupSortButton();
             setupResetListener();
+            addSubscriber(this);
     }
 
     private void loadMoviesFromAPIAndRefreshDatabase() {
@@ -252,7 +253,21 @@ public class HomeController implements Initializable, MovieCellActionHandler
                     movie -> onRemoveWatchlistClicked(movie))
             );
         });
+    }
+
+    public List<Movie> sortMovies(boolean sortLogic,List<Movie> observableMovies)
+    {
+        //Aufsteigend sortieren mit MovieComparator Klasse
+        if(sortLogic)
+        {observableMovies.sort(new MovieComparator());}
+        else
+        {//Aufsteigend sortieren mit MovieComparator Klasse
+            observableMovies.sort(new MovieComparator().reversed());}
+
+        return(observableMovies);
+
     }*/
+
     private void setupSortButton()
     {
         sortState = new NotSorted();
@@ -309,18 +324,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
     }
 
 
-    public List<Movie> sortMovies(boolean sortLogic,List<Movie> observableMovies)
-    {
-            //Aufsteigend sortieren mit MovieComparator Klasse
-            if(sortLogic)
-            {observableMovies.sort(new MovieComparator());}
-            else
-            {//Aufsteigend sortieren mit MovieComparator Klasse
-            observableMovies.sort(new MovieComparator().reversed());}
 
-        return(observableMovies);
-
-    }
 
     private void handleFilter(ActionEvent actionEvent) {
 
@@ -507,6 +511,7 @@ public class HomeController implements Initializable, MovieCellActionHandler
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 
 }
 
