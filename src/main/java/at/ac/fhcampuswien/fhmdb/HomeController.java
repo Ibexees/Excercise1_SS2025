@@ -251,7 +251,7 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
                     movie -> onRemoveWatchlistClicked(movie))
             );
         });
-    }
+    }*/
 
     public List<Movie> sortMovies(boolean sortLogic,List<Movie> observableMovies)
     {
@@ -264,7 +264,7 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
 
         return(observableMovies);
 
-    }*/
+    }
 
     private void setupSortButton()
     {
@@ -299,6 +299,13 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
     {
         allMovies = movieList;
         observableMovies = movieList;
+    }
+
+
+
+    public List<Movie> getAllMovies()
+    {
+        return allMovies;
     }
 
     /**Resets all Parameters and fetches all movies from the API*/

@@ -1,6 +1,10 @@
 package at.ac.fhcampuswien.fhmdb;
+import at.ac.fhcampuswien.fhmdb.logic.NotSorted;
+import at.ac.fhcampuswien.fhmdb.logic.SortState;
+import at.ac.fhcampuswien.fhmdb.logic.SortedAsc;
 import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
 import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +17,7 @@ import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.api.FxRobot;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static javafx.application.Application.launch;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +37,42 @@ public class HomeControllerFXTest extends ApplicationTest
         homeController = fxmlLoader.getController();
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Test
+    public void statePattern_movies_sorted_by_title_asc() {
+        List<Movie> expectedSorted = Arrays.asList(
+                new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION, Genre.SCIENCE_FICTION)),
+                new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY, Genre.ACTION)),
+                new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER, Genre.MYSTERY)),
+                new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY, Genre.ACTION)),
+                new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA))
+        );
+
+        List<Movie> unsortedMovies = Arrays.asList(
+                new Movie("Your Name", "Coming of Age romance", Arrays.asList(Genre.ROMANCE, Genre.DRAMA)),
+                new Movie("Into the Spiderverse", "interdimensional spider people", Arrays.asList(Genre.ACTION, Genre.SCIENCE_FICTION)),
+                new Movie("Shutter Island", "Believing doesn't equal the truth", Arrays.asList(Genre.THRILLER, Genre.MYSTERY)),
+                new Movie("Southpaw", "Boxen", Arrays.asList(Genre.BIOGRAPHY, Genre.ACTION)),
+                new Movie("Kung Fu Panda", "Wuxifingegriff", Arrays.asList(Genre.COMEDY, Genre.ACTION))
+        );
+
+        ObservableList<Movie> expectedSortedObservable = FXCollections.observableArrayList();
+        ObservableList<Movie> unsortedObservable = FXCollections.observableArrayList();
+
+        expectedSortedObservable.addAll(expectedSorted);
+        unsortedObservable.addAll(unsortedMovies);
+
+
+        Platform.runLater(() -> {
+            homeController.setAllMovies(unsortedObservable);
+            homeController.setSortState(new NotSorted());
+            homeController.getSortState().sort(homeController);
+            System.out.println(homeController.getObservableMovies());
+        });
+
+        assertEquals(expectedSorted, expectedSortedObservable);
+
     }
 
 

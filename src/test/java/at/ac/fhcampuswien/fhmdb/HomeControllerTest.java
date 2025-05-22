@@ -4,6 +4,7 @@ import at.ac.fhcampuswien.fhmdb.dataLayer.database.DatabaseManager;
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieEntity;
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.logic.MovieAnalysisService;
+import at.ac.fhcampuswien.fhmdb.logic.SortState;
 import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
 import at.ac.fhcampuswien.fhmdb.logic.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
@@ -436,6 +437,7 @@ class HomeControllerTest {
         MovieEntity movieEntity = new MovieEntity("ID","title","desc",list,10,null,9,5);
         assertEquals("ACTION, ROMANCE",movieEntity.getGenres());
     }
+
 
 
 
