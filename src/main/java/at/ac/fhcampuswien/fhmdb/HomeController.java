@@ -3,10 +3,7 @@ package at.ac.fhcampuswien.fhmdb;
 import at.ac.fhcampuswien.fhmdb.dataLayer.api.MovieAPIException;
 import at.ac.fhcampuswien.fhmdb.dataLayer.api.Deserializer;
 import at.ac.fhcampuswien.fhmdb.dataLayer.api.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.DataBaseException;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistMovieEntity;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistRepository;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.*;
 import at.ac.fhcampuswien.fhmdb.logic.MovieAnalysisService;
 import at.ac.fhcampuswien.fhmdb.logic.NotSorted;
 import at.ac.fhcampuswien.fhmdb.logic.SortState;
@@ -16,6 +13,7 @@ import at.ac.fhcampuswien.fhmdb.logic.MovieComparator;
 import at.ac.fhcampuswien.fhmdb.logic.models.Rating;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCellActionHandler;
+import at.ac.fhcampuswien.fhmdb.ui.Observer;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -37,7 +35,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HomeController  implements Initializable, MovieCellActionHandler
+public class HomeController  implements Initializable, MovieCellActionHandler, Observer
 {
     @FXML
     public JFXButton searchBtn;
@@ -130,7 +128,7 @@ public class HomeController  implements Initializable, MovieCellActionHandler
             setupButtonHandlers();
             setupSortButton();
             setupResetListener();
-            addSubscriber(this);
+            watchlistRepository.addSubscriber(this);
     }
 
     private void loadMoviesFromAPIAndRefreshDatabase() {
@@ -459,6 +457,7 @@ public class HomeController  implements Initializable, MovieCellActionHandler
         if(!movieInList)
         {
             watchListMovies.add(movie);
+        }
             try
             {
                 watchlistRepository.addToWatchlist(new WatchlistMovieEntity(movie));
@@ -468,11 +467,11 @@ public class HomeController  implements Initializable, MovieCellActionHandler
             } catch (Exception e) {
                 showErrorDialog("unexpected error", "unexpected error occured");
             }
-        }
-        else
+
+        /*else
         {
             System.out.println("Movie already in Watchlist");
-        }
+        }*/
 
     }
 
@@ -493,7 +492,7 @@ public class HomeController  implements Initializable, MovieCellActionHandler
             watchListMovies.remove(movie);
             try {
                 watchlistRepository.removeFromWatchlist(movie.getId());
-                showErrorDialog("Success", "Movie successfully removed from watchlist!");
+                //showErrorDialog("Success", "Movie successfully removed from watchlist!");
             } catch (DataBaseException e) {
                 showErrorDialog("Database Error", "Failed to remove movie from watchlist: " + e.getMessage());
             } catch (Exception e) {
@@ -512,6 +511,38 @@ public class HomeController  implements Initializable, MovieCellActionHandler
         alert.showAndWait();
     }
 
+    private void showSuccessDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+   /* @Override
+    public void movieSavedToWatchlist()
+    {
+        showSuccessDialog("Success", "Movie added to Watchlist");
+    }
+
+    @Override
+    public void movieRemovedFromWatchlist()
+    {
+        showSuccessDialog("Success", "Movie removed from Watchlist");
+    }*/
+
+    @Override
+    public void onRepositoryEvent(WatchlistRepositoryEvent event)
+    {
+        switch (event.getType()) {
+            case MOVIE_ADDED, MOVIE_REMOVED:
+                showSuccessDialog("Success", event.getMessage());
+                break;
+            case ERROR, MOVIE_ALREADY_EXISTS:
+                showErrorDialog("Error", event.getMessage());
+                break;
+        }
+    }
 
 }
 

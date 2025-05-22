@@ -21,10 +21,14 @@ public abstract class AbstractObservable implements Observable
         subscriber.remove(observer);
     }
 
-    @Override
-    public void notifyAddedToWatchlist()
-    {
 
+    @Override
+    public void notifyObserver(WatchlistRepositoryEvent event)
+    {
+        for(Observer s : subscriber)
+        {
+            s.onRepositoryEvent(event);
+        }
     }
 
     public List<Observer> getSubscriber()

@@ -33,9 +33,14 @@ public class WatchlistRepository extends AbstractObservable implements Observabl
         if(existing.isEmpty())
         {
             dao.create(movie);
+            this.onWatchlistAdd();
+        }
+        else
+        {
+            this.onWatchlistAddExisting();
         }
 
-        notifyAddedToWatchlist();
+
         return;
     }
 
@@ -44,16 +49,29 @@ public class WatchlistRepository extends AbstractObservable implements Observabl
         DeleteBuilder<WatchlistMovieEntity, Long> deleteBuilder = dao.deleteBuilder();
         deleteBuilder.where().eq("apiID", apiID);
         deleteBuilder.delete();
+        this.onWatchlistRemove();
         return 1;
     }
 
     @Override
-    public void notifyAddedToWatchlist()
+    public void onWatchlistAdd()
     {
-        for(Observer s : subscriber)
-        {
+        WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_ADDED,"Movie Successfully added to Watchlist");
+        notifyObserver(event);
 
-        }
+    }
 
+    @Override
+    public void onWatchlistRemove()
+    {
+        WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_REMOVED, "Movie Successfully removed from Watchlist");
+        notifyObserver(event);
+    }
+
+    @Override
+    public void onWatchlistAddExisting()
+    {
+        WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_ALREADY_EXISTS, "Movie already in Watchlist");
+        notifyObserver(event);
     }
 }
