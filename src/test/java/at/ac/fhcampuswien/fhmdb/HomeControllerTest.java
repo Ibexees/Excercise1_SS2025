@@ -438,6 +438,19 @@ class HomeControllerTest {
         assertEquals("ACTION, ROMANCE",movieEntity.getGenres());
     }
 
+    @Test
+    void testSingletonControllerInstance() {
+        ControllerFactory factory = new ControllerFactory();
+
+        // Zwei Instanzen anfordern
+        Object controller1 = factory.call(HomeController.class);
+        Object controller2 = factory.call(HomeController.class);
+
+        // Prüfen, ob beide Instanzen gleich sind
+        assertNotNull(controller1, "Controller instance should not be null");
+        assertSame(controller1, controller2, "Factory should return the same instance (singleton)");
+    }
+
 
 
 

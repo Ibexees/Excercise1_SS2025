@@ -18,6 +18,7 @@ public class FhmdbApplication extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(FhmdbApplication.class.getResource("home-view.fxml"));
+            fxmlLoader.setControllerFactory(new ControllerFactory());
             Scene scene = new Scene(fxmlLoader.load(), 890, 620);
             stage.setTitle("FHMDb");
             stage.setScene(scene);
