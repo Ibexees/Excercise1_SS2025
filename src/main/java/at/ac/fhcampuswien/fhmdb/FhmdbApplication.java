@@ -29,14 +29,17 @@ public class FhmdbApplication extends Application {
         {
             System.out.println("HERE");
         }
+        /*
         catch (IOException e)
         {
             e.printStackTrace();
             //handleStartupException(e);
         }
-       /* catch (Exception e) {
+        */
+
+       catch (Exception e) {
             handleStartupException(e);
-        }*/
+        }
     }
 
     private void handleStartupException(Exception e) {
