@@ -1,8 +1,6 @@
 package at.ac.fhcampuswien.fhmdb;
 import at.ac.fhcampuswien.fhmdb.dataLayer.api.Deserializer;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.DatabaseManager;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieEntity;
-import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
+import at.ac.fhcampuswien.fhmdb.dataLayer.database.*;
 import at.ac.fhcampuswien.fhmdb.logic.MovieAnalysisService;
 import at.ac.fhcampuswien.fhmdb.logic.SortState;
 import at.ac.fhcampuswien.fhmdb.logic.models.Genre;
@@ -449,6 +447,15 @@ class HomeControllerTest {
         // Prüfen, ob beide Instanzen gleich sind
         assertNotNull(controller1, "Controller instance should not be null");
         assertSame(controller1, controller2, "Factory should return the same instance (singleton)");
+    }
+
+    @Test
+    void watchlistRepositoryIsSingleton()
+    {
+        WatchlistRepository watchlistRepository1 = new WatchlistRepository();
+        WatchlistRepository watchlistRepository2 = new WatchlistRepository();
+
+        assertSame(watchlistRepository1,watchlistRepository2);
     }
 
 
