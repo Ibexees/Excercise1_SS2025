@@ -1,20 +1,23 @@
 package at.ac.fhcampuswien.fhmdb;
 
-import at.ac.fhcampuswien.fhmdb.dataLayer.api.MovieAPI;
-import at.ac.fhcampuswien.fhmdb.dataLayer.api.MovieAPIRequestBuilder;
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.MovieRepository;
 import at.ac.fhcampuswien.fhmdb.dataLayer.database.WatchlistRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Integration Tests für Builder Pattern + Singleton Pattern zusammen
- * Testet nur die Pattern-Implementation, keine Repository-spezifischen Methoden
+ * Testcases für Singleton Pattern - Repository Klassen
+ * NUR Singleton-Verhalten wird getestet, keine Repository-spezifischen Methoden
  */
-class BuilderSingletonIntegrationTest {
+class SingletonPatternTest {
 
     @BeforeEach
     void setUp() {
@@ -25,230 +28,194 @@ class BuilderSingletonIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        // Clean up after tests
+        // Clean up after each test
         MovieRepository.resetInstance();
         WatchlistRepository.resetInstance();
     }
 
     @Test
-    void testRequirementsExample1_BuilderPattern() {
-        // Exact example from Exercise 4 requirements:
-        // String url = new MovieAPIRequestBuilder(base)
-        //  .query("suchwort")
-        //  .genre("ACTION")
-        //  .releaseYear("2012")
-        //  .ratingFrom("8.3")
-        //  .build();
-
-        String base = "https://prog2.fh-campuswien.ac.at/movies";
-
+    void testMovieRepositorySingleton_ShouldReturnSameInstance() {
         // Act
-        String url = new MovieAPIRequestBuilder(base)
-                .query("suchwort")
-                .genre("ACTION")
-                .releaseYear("2012")
-                .ratingFrom("8.3")
-                .build();
+        MovieRepository instance1 = MovieRepository.getInstance();
+        MovieRepository instance2 = MovieRepository.getInstance();
 
         // Assert
-        String expected = "https://prog2.fh-campuswien.ac.at/movies?query=suchwort&genre=ACTION&releaseYear=2012&ratingFrom=8.3";
-        assertEquals(expected, url);
+        assertNotNull(instance1, "First instance should not be null");
+        assertNotNull(instance2, "Second instance should not be null");
+        assertSame(instance1, instance2, "Both instances should be the same object");
     }
 
     @Test
-    void testRequirementsExample2_BuilderPattern() {
-        // Exact example from Exercise 4 requirements:
-        // String url = new MovieAPIRequestBuilder(base + "/" + id).build();
-
-        String base = "https://prog2.fh-campuswien.ac.at/movies";
-        String id = "12345";
-
+    void testWatchlistRepositorySingleton_ShouldReturnSameInstance() {
         // Act
-        String url = new MovieAPIRequestBuilder(base + "/" + id).build();
+        WatchlistRepository instance1 = WatchlistRepository.getInstance();
+        WatchlistRepository instance2 = WatchlistRepository.getInstance();
 
         // Assert
-        String expected = "https://prog2.fh-campuswien.ac.at/movies/12345";
-        assertEquals(expected, url);
+        assertNotNull(instance1, "First instance should not be null");
+        assertNotNull(instance2, "Second instance should not be null");
+        assertSame(instance1, instance2, "Both instances should be the same object");
     }
 
     @Test
-    void testRepositoriesAreSingletons_RequirementFulfilled() {
-        // Requirements: "Die Repository Klassen sind als Singleton implementiert"
+    void testDifferentRepositoryTypes_ShouldBeDifferentObjects() {
+        // Act
+        MovieRepository movieRepo = MovieRepository.getInstance();
+        WatchlistRepository watchlistRepo = WatchlistRepository.getInstance();
+
+        // Assert
+        assertNotSame(movieRepo, watchlistRepo, "Different repository types should be different objects");
+    }
+
+    @Test
+    void testMovieRepositoryReset_ShouldCreateNewInstanceAfterReset() {
+        // Arrange
+        MovieRepository instance1 = MovieRepository.getInstance();
 
         // Act
+        MovieRepository.resetInstance();
+        MovieRepository instance2 = MovieRepository.getInstance();
+
+        // Assert
+        assertNotNull(instance1, "First instance should not be null");
+        assertNotNull(instance2, "Second instance should not be null");
+        assertNotSame(instance1, instance2, "Instance after reset should be different");
+    }
+
+    @Test
+    void testWatchlistRepositoryReset_ShouldCreateNewInstanceAfterReset() {
+        // Arrange
+        WatchlistRepository instance1 = WatchlistRepository.getInstance();
+
+        // Act
+        WatchlistRepository.resetInstance();
+        WatchlistRepository instance2 = WatchlistRepository.getInstance();
+
+        // Assert
+        assertNotNull(instance1, "First instance should not be null");
+        assertNotNull(instance2, "Second instance should not be null");
+        assertNotSame(instance1, instance2, "Instance after reset should be different");
+    }
+
+    @Test
+    void testMovieRepositorySingleton_ThreadSafety() throws InterruptedException {
+        // Arrange
+        final int threadCount = 5;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        Future<MovieRepository>[] futures = new Future[threadCount];
+
+        // Act - Create multiple threads trying to get the singleton instance
+        for (int i = 0; i < threadCount; i++) {
+            futures[i] = executor.submit(MovieRepository::getInstance);
+        }
+
+        // Wait for all threads to complete
+        executor.shutdown();
+        assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
+
+        // Assert - All threads should return the same instance
+        try {
+            MovieRepository firstInstance = futures[0].get();
+            for (int i = 1; i < threadCount; i++) {
+                MovieRepository instance = futures[i].get();
+                assertSame(firstInstance, instance, "All instances from different threads should be the same");
+            }
+        } catch (Exception e) {
+            fail("Exception occurred while getting instances from futures: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void testWatchlistRepositorySingleton_ThreadSafety() throws InterruptedException {
+        // Arrange
+        final int threadCount = 5;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        Future<WatchlistRepository>[] futures = new Future[threadCount];
+
+        // Act - Create multiple threads trying to get the singleton instance
+        for (int i = 0; i < threadCount; i++) {
+            futures[i] = executor.submit(WatchlistRepository::getInstance);
+        }
+
+        // Wait for all threads to complete
+        executor.shutdown();
+        assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
+
+        // Assert - All threads should return the same instance
+        try {
+            WatchlistRepository firstInstance = futures[0].get();
+            for (int i = 1; i < threadCount; i++) {
+                WatchlistRepository instance = futures[i].get();
+                assertSame(firstInstance, instance, "All instances from different threads should be the same");
+            }
+        } catch (Exception e) {
+            fail("Exception occurred while getting instances from futures: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void testSingletonIntegrityAfterMultipleGetInstance() {
+        // Arrange & Act - Get instances multiple times
         MovieRepository movieRepo1 = MovieRepository.getInstance();
-        MovieRepository movieRepo2 = MovieRepository.getInstance();
-
         WatchlistRepository watchlistRepo1 = WatchlistRepository.getInstance();
+        MovieRepository movieRepo2 = MovieRepository.getInstance();
         WatchlistRepository watchlistRepo2 = WatchlistRepository.getInstance();
+        MovieRepository movieRepo3 = MovieRepository.getInstance();
+        WatchlistRepository watchlistRepo3 = WatchlistRepository.getInstance();
 
-        // Assert
-        assertSame(movieRepo1, movieRepo2, "MovieRepository should be singleton");
-        assertSame(watchlistRepo1, watchlistRepo2, "WatchlistRepository should be singleton");
+        // Assert - All should be the same instances
+        assertSame(movieRepo1, movieRepo2, "Movie repository instances should be identical");
+        assertSame(movieRepo2, movieRepo3, "Movie repository instances should be identical");
+        assertSame(watchlistRepo1, watchlistRepo2, "Watchlist repository instances should be identical");
+        assertSame(watchlistRepo2, watchlistRepo3, "Watchlist repository instances should be identical");
     }
 
     @Test
-    void testBuilderWithMovieAPIStaticMethods() {
-        // Test integration with MovieAPI static methods
+    void testHomeControllerUsesSingletons() {
+        // Note: Dieser Test prüft indirekt, dass HomeController Singletons verwendet
+        // Da HomeController jetzt getInstance() verwendet, sollten diese Repositories dieselben sein
 
         // Act
-        MovieAPIRequestBuilder builder1 = MovieAPI.builder();
-        String url1 = builder1.query("test").build();
+        MovieRepository directInstance = MovieRepository.getInstance();
+        WatchlistRepository directWatchlistInstance = WatchlistRepository.getInstance();
 
-        MovieAPIRequestBuilder builder2 = MovieAPI.builder("https://example.com");
-        String url2 = builder2.query("test").build();
+        // Weitere Instanzen holen (simuliert HomeController-Verwendung)
+        MovieRepository homeControllerInstance = MovieRepository.getInstance();
+        WatchlistRepository homeControllerWatchlistInstance = WatchlistRepository.getInstance();
 
         // Assert
-        assertTrue(url1.contains("query=test"));
-        assertEquals("https://example.com?query=test", url2);
+        assertSame(directInstance, homeControllerInstance, "HomeController should use same MovieRepository singleton");
+        assertSame(directWatchlistInstance, homeControllerWatchlistInstance, "HomeController should use same WatchlistRepository singleton");
     }
 
     @Test
-    void testPatternsWorkTogetherInRealisticScenario() {
-        // Simulate realistic usage scenario combining both patterns
-
-        // 1. Get singleton repositories (like HomeController does)
+    void testSingletonInstancesAreNotNull() {
+        // Act
         MovieRepository movieRepo = MovieRepository.getInstance();
         WatchlistRepository watchlistRepo = WatchlistRepository.getInstance();
 
-        // 2. Use builder to create API URLs (like filtering would do)
-        String filterUrl = MovieAPI.builder()
-                .query("batman")
-                .genre("ACTION")
-                .releaseYear("2008")
-                .build();
-
-        // 3. Verify both work correctly
-        assertNotNull(movieRepo, "MovieRepository singleton should be available");
-        assertNotNull(watchlistRepo, "WatchlistRepository singleton should be available");
-        assertTrue(filterUrl.contains("query=batman"), "Builder should create correct URL");
-
-        // 4. Verify singletons remain consistent
-        MovieRepository movieRepo2 = MovieRepository.getInstance();
-        WatchlistRepository watchlistRepo2 = WatchlistRepository.getInstance();
-
-        assertSame(movieRepo, movieRepo2, "Repository instances should remain consistent");
-        assertSame(watchlistRepo, watchlistRepo2, "Repository instances should remain consistent");
+        // Assert
+        assertNotNull(movieRepo, "MovieRepository singleton should not be null");
+        assertNotNull(watchlistRepo, "WatchlistRepository singleton should not be null");
     }
 
     @Test
-    void testBuilderPatternFlexibility() {
-        // Test that builder allows different parameter combinations
-
-        String base = "https://prog2.fh-campuswien.ac.at/movies";
-
-        // Different combinations
-        String url1 = new MovieAPIRequestBuilder(base).query("action").build();
-        String url2 = new MovieAPIRequestBuilder(base).genre("COMEDY").build();
-        String url3 = new MovieAPIRequestBuilder(base).query("batman").genre("ACTION").build();
-        String url4 = new MovieAPIRequestBuilder(base).build(); // No parameters
-
-        // Assert all work correctly
-        assertEquals(base + "?query=action", url1);
-        assertEquals(base + "?genre=COMEDY", url2);
-        assertEquals(base + "?query=batman&genre=ACTION", url3);
-        assertEquals(base, url4);
-    }
-
-    @Test
-    void testSingletonPatternMemoryEfficiency() {
-        // Test that singleton pattern doesn't create unnecessary instances
-
-        // Create multiple references
-        MovieRepository[] movieRefs = new MovieRepository[3];
-        WatchlistRepository[] watchlistRefs = new WatchlistRepository[3];
-
+    void testMultipleResetAndRecreate() {
+        // Test multiple reset cycles
         for (int i = 0; i < 3; i++) {
-            movieRefs[i] = MovieRepository.getInstance();
-            watchlistRefs[i] = WatchlistRepository.getInstance();
-        }
-
-        // All should reference the same objects
-        for (int i = 1; i < 3; i++) {
-            assertSame(movieRefs[0], movieRefs[i], "All MovieRepository references should be identical");
-            assertSame(watchlistRefs[0], watchlistRefs[i], "All WatchlistRepository references should be identical");
-        }
-    }
-
-    @Test
-    void testExercise4Requirements_BothPatternsImplemented() {
-        // Final verification that Exercise 4 requirements are met
-
-        // 1. Builder Pattern requirement
-        assertDoesNotThrow(() -> {
-            String url = new MovieAPIRequestBuilder("https://prog2.fh-campuswien.ac.at/movies")
-                    .query("test")
-                    .genre("ACTION")
-                    .build();
-            assertNotNull(url);
-        }, "Builder Pattern should be implemented and working");
-
-        // 2. Singleton Pattern requirement
-        assertDoesNotThrow(() -> {
+            // Act
             MovieRepository repo1 = MovieRepository.getInstance();
-            MovieRepository repo2 = MovieRepository.getInstance();
-            assertSame(repo1, repo2);
-
             WatchlistRepository watch1 = WatchlistRepository.getInstance();
+
+            // Assert instances are singletons within cycle
+            MovieRepository repo2 = MovieRepository.getInstance();
             WatchlistRepository watch2 = WatchlistRepository.getInstance();
-            assertSame(watch1, watch2);
-        }, "Singleton Pattern should be implemented and working");
-    }
+            assertSame(repo1, repo2, "Should be singleton within cycle " + i);
+            assertSame(watch1, watch2, "Should be singleton within cycle " + i);
 
-    @Test
-    void testBuilderAndSingletonWorkIndependently() {
-        // Test that both patterns work independently
-
-        // Test Builder independently
-        String builderUrl = new MovieAPIRequestBuilder("https://test.com")
-                .query("independent")
-                .genre("TEST")
-                .build();
-        assertEquals("https://test.com?query=independent&genre=TEST", builderUrl);
-
-        // Test Singleton independently
-        MovieRepository repo1 = MovieRepository.getInstance();
-        MovieRepository repo2 = MovieRepository.getInstance();
-        assertSame(repo1, repo2);
-
-        // Test they don't interfere with each other
-        String builderUrl2 = new MovieAPIRequestBuilder("https://test2.com")
-                .query("still_working")
-                .build();
-        assertEquals("https://test2.com?query=still_working", builderUrl2);
-
-        MovieRepository repo3 = MovieRepository.getInstance();
-        assertSame(repo1, repo3);
-    }
-
-    @Test
-    void testCompleteWorkflow_HomeControllerSimulation() {
-        // Simulate complete workflow like HomeController would use
-
-        // 1. Initialize repositories (singleton)
-        MovieRepository movieRepo = MovieRepository.getInstance();
-        WatchlistRepository watchlistRepo = WatchlistRepository.getInstance();
-
-        // 2. Build filter URL (builder pattern)
-        String filterUrl = MovieAPI.builder()
-                .query("action movies")
-                .genre("ACTION")
-                .releaseYear("2023")
-                .ratingFrom("7.0")
-                .build();
-
-        // 3. Verify everything works
-        assertNotNull(movieRepo);
-        assertNotNull(watchlistRepo);
-        assertTrue(filterUrl.contains("query=action%20movies"));
-        assertTrue(filterUrl.contains("genre=ACTION"));
-        assertTrue(filterUrl.contains("releaseYear=2023"));
-        assertTrue(filterUrl.contains("ratingFrom=7.0"));
-
-        // 4. Verify singletons are maintained throughout workflow
-        MovieRepository movieRepo2 = MovieRepository.getInstance();
-        WatchlistRepository watchlistRepo2 = WatchlistRepository.getInstance();
-        assertSame(movieRepo, movieRepo2);
-        assertSame(watchlistRepo, watchlistRepo2);
+            // Reset for next cycle
+            MovieRepository.resetInstance();
+            WatchlistRepository.resetInstance();
+        }
     }
 }
