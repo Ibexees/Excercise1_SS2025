@@ -10,10 +10,11 @@ import java.util.List;
 
 public class WatchlistRepository extends AbstractObservable implements Observable
 {
+    private static WatchlistRepository instance;
     Dao<WatchlistMovieEntity, Long> dao;
 
 
-    public WatchlistRepository() {
+    private WatchlistRepository() {
         try {
             this.dao = DatabaseManager.getDatabase().getDynamicDao(WatchlistMovieEntity.class);
         } catch (Exception e) {
@@ -74,4 +75,24 @@ public class WatchlistRepository extends AbstractObservable implements Observabl
         WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_ALREADY_EXISTS, "Movie already in Watchlist");
         notifyObserver(event);
     }
+
+    public static WatchlistRepository getInstance() {
+        if (instance == null) {
+            synchronized (WatchlistRepository.class) {
+                if (instance == null) {
+                    instance = new WatchlistRepository();
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Resets the singleton instance (for testing purposes).
+     */
+    public static synchronized void resetInstance() {
+        instance = null;
+    }
 }
+
+

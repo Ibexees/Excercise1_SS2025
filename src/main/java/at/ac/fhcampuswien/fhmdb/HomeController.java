@@ -95,8 +95,8 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
 
     public HomeController() {
             movieAnalysisService = new MovieAnalysisService();
-            movieRepository = new MovieRepository();
-            watchlistRepository = new WatchlistRepository();
+            movieRepository = MovieRepository.getInstance();
+            watchlistRepository = WatchlistRepository.getInstance();
     }
 
     private void initializeWatchlistFromDB() throws SQLException
@@ -500,9 +500,9 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
             try {
                 watchlistRepository.removeFromWatchlist(movie.getId());
                 //showErrorDialog("Success", "Movie successfully removed from watchlist!");
-            } catch (DataBaseException e) {
+            } catch (DataBaseException e) { // speziallisiert auf DB
                 showErrorDialog("Database Error", "Failed to remove movie from watchlist: " + e.getMessage());
-            } catch (Exception e) {
+            } catch (Exception e) { // allgememeier typ von exceptions
                 showErrorDialog("Unexpected Error", "An unexpected error occurred while removing from the watchlist: " + e.getMessage());
             }
         } else {
@@ -511,11 +511,11 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
     }
 
     private void showErrorDialog(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR); // neues alert objekt erstellt um fehlermeldung anzuzueigen
+        alert.setTitle(title);// titel des fensterdialogs gesetzt
+        alert.setHeaderText(null);// kopfbereich leer, dh kein extra text
+        alert.setContentText(message);// inhaltstext, zeigt fehler im dialog an, text wird durch parameter message festgelegt
+        alert.showAndWait();// zeigt dialog an, bis benutzer auf ok drückt
     }
 
     private void showSuccessDialog(String title, String message) {

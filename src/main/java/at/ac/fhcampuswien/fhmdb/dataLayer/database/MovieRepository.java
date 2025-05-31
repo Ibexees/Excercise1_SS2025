@@ -9,10 +9,11 @@ import java.util.List;
 
 public class MovieRepository
 {
+    private static MovieRepository instance;
     Dao<MovieEntity, Long> dao;
 
 
-    public MovieRepository() {
+    private MovieRepository() {
     try {
         this.dao = DatabaseManager.getDatabase().getDynamicDao(MovieEntity.class);
     } catch (Exception e) {
@@ -76,6 +77,22 @@ public class MovieRepository
         }
     }
 
+    public static MovieRepository getInstance() {
+        if (instance == null) {
+            synchronized (MovieRepository.class) {
+                if (instance == null) {
+                    instance = new MovieRepository();
+                }
+            }
+        }
+        return instance;
+    }
 
-
+    public static synchronized void resetInstance() {
+        instance = null;
+    }
 }
+
+
+
+

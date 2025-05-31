@@ -10,25 +10,13 @@ import java.util.Scanner;
 
 public class MovieAPI {
 
-    /**
-     * This class contains methods to interact with the online movie API,
-     * specifically to send HTTP GET requests and receive movie data as a JSON response.
-     * <p>
-     * Its purpose is to build a URL with query parameters, send the HTTP GET request to the movie API,
-     * and return the JSON response as a String.
-     *
-     * @param params a key-value pair map used to add query parameters to the URL
-     * @return the JSON response as a String
-     * @throws IOException   if a network or I/O error occurs during the request
-     * @throws MovieAPIException  if the API responds with a non-successful HTTP status code
-     */
+
 
     public static String getMovies(Map<String, String> params) throws MovieAPIException, IOException {
         String apiUrl = "https://prog2.fh-campuswien.ac.at/movies";
         String fullUrl = buildUrlWithParams(apiUrl, params);
         HttpURLConnection connection = createHttpConnection(fullUrl);
         return readResponse(connection);
-
     }
 
     private static String buildUrlWithParams(String apiUrl, Map<String, String> params) {
@@ -79,4 +67,32 @@ public class MovieAPI {
         }
         return response.toString();
     }
+
+
+
+    /**
+     * Fetches movies from the API using a pre-built URL.
+     * NEW METHOD for Builder Pattern support.
+     */
+    public static String getMovies(String url) throws MovieAPIException, IOException {
+        HttpURLConnection connection = createHttpConnection(url);
+        return readResponse(connection);
+    }
+
+    /**
+     * Creates a new MovieAPIRequestBuilder for URL construction.
+     * NEW METHOD for Builder Pattern support.
+     */
+    public static MovieAPIRequestBuilder builder() {
+        return new MovieAPIRequestBuilder("https://prog2.fh-campuswien.ac.at/movies");
+    }
+
+    /**
+     * Creates a new MovieAPIRequestBuilder with a custom base URL.
+     * NEW METHOD for Builder Pattern support.
+     */
+    public static MovieAPIRequestBuilder builder(String baseUrl) {
+        return new MovieAPIRequestBuilder(baseUrl);
+    }
 }
+
