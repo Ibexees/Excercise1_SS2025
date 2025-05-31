@@ -20,6 +20,8 @@ class HomeControllerTest {
     private List<Movie> movies;
 
     private MovieAnalysisService movieAnalysisService;
+    private WatchlistRepository watchlistRepository;
+
 
     @BeforeEach
     void setUp() {
@@ -457,6 +459,9 @@ class HomeControllerTest {
 
         assertSame(watchlistRepository1,watchlistRepository2);
     }
+
+
+
 
 
 

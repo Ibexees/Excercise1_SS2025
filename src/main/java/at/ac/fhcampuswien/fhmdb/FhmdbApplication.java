@@ -40,6 +40,8 @@ public class FhmdbApplication extends Application {
        catch (Exception e) {
             handleStartupException(e);
         }
+
+
     }
 
     private void handleStartupException(Exception e) {
