@@ -14,7 +14,7 @@ public class WatchlistRepository extends AbstractObservable implements Observabl
     Dao<WatchlistMovieEntity, Long> dao;
 
 
-    private WatchlistRepository() {
+    public WatchlistRepository() {
         try {
             this.dao = DatabaseManager.getDatabase().getDynamicDao(WatchlistMovieEntity.class);
         } catch (Exception e) {
