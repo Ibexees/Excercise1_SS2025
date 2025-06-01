@@ -519,7 +519,7 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
     }
 
     private void showSuccessDialog(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
