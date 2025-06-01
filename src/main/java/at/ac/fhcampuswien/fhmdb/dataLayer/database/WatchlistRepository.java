@@ -54,7 +54,6 @@ public class WatchlistRepository extends AbstractObservable implements Observabl
         return 1;
     }
 
-    @Override
     public void onWatchlistAdd()
     {
         WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_ADDED,"Movie Successfully added to Watchlist");
@@ -62,14 +61,12 @@ public class WatchlistRepository extends AbstractObservable implements Observabl
 
     }
 
-    @Override
     public void onWatchlistRemove()
     {
         WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_REMOVED, "Movie Successfully removed from Watchlist");
         notifyObserver(event);
     }
 
-    @Override
     public void onWatchlistAddExisting()
     {
         WatchlistRepositoryEvent event = new WatchlistRepositoryEvent(WatchlistRepositoryEvent.Type.MOVIE_ALREADY_EXISTS, "Movie already in Watchlist");
