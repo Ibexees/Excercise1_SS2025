@@ -70,27 +70,18 @@ public class MovieAPI {
 
 
 
-    /**
-     * Fetches movies from the API using a pre-built URL.
-     * NEW METHOD for Builder Pattern support.
-     */
+
     public static String getMovies(String url) throws MovieAPIException, IOException {
         HttpURLConnection connection = createHttpConnection(url);
         return readResponse(connection);
     }
 
-    /**
-     * Creates a new MovieAPIRequestBuilder for URL construction.
-     * NEW METHOD for Builder Pattern support.
-     */
+
     public static MovieAPIRequestBuilder builder() {
         return new MovieAPIRequestBuilder("https://prog2.fh-campuswien.ac.at/movies");
     }
 
-    /**
-     * Creates a new MovieAPIRequestBuilder with a custom base URL.
-     * NEW METHOD for Builder Pattern support.
-     */
+
     public static MovieAPIRequestBuilder builder(String baseUrl) {
         return new MovieAPIRequestBuilder(baseUrl);
     }
