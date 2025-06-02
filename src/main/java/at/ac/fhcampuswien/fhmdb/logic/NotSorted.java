@@ -16,10 +16,14 @@ public class NotSorted implements SortState
         context.sortBtn.setText("Sorted Asc");
 
         ObservableList<Movie> observableMovies = context.getObservableMovies();
-        observableMovies.sort(new MovieComparator());
-        observableMovies = FXCollections.observableArrayList(observableMovies);
-        context.setObservableMovies(observableMovies);
-        context.movieListView.setItems(observableMovies);
+
+        if(!HomeController.buttonsVisible)
+        {observableMovies = context.getWatchListMovies();}
+
+            observableMovies.sort(new MovieComparator());
+            observableMovies = FXCollections.observableArrayList(observableMovies);
+            context.setObservableMovies(observableMovies);
+            context.movieListView.setItems(observableMovies);
 
     }
 }

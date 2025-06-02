@@ -99,6 +99,11 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
             watchlistRepository = WatchlistRepository.getInstance();
     }
 
+    public ObservableList<Movie> getWatchListMovies()
+    {
+        return watchListMovies;
+    }
+
     private void initializeWatchlistFromDB() throws SQLException
     {
         List<WatchlistMovieEntity> dbWatchlist = watchlistRepository.getWatchlist();
@@ -290,7 +295,6 @@ public class HomeController  implements Initializable, MovieCellActionHandler, O
     {
         buttonsVisible = false;
         movieListView.setItems(watchListMovies);
-
 
     }
 

@@ -17,10 +17,13 @@ public class SortedAsc implements SortState
         context.sortBtn.setText("Sorted Desc");
 
         ObservableList<Movie> observableMovies = context.getObservableMovies();
+
+        if(!HomeController.buttonsVisible)
+        {observableMovies = context.getWatchListMovies();}
+
         observableMovies.sort(new MovieComparator().reversed());
         observableMovies = FXCollections.observableArrayList(observableMovies);
         context.setObservableMovies(observableMovies);
-
         context.movieListView.setItems(observableMovies);
 
     }

@@ -16,6 +16,10 @@ public class SortedDesc implements SortState
         context.sortBtn.setText("Sorted Asc");
 
         ObservableList<Movie> observableMovies = context.getObservableMovies();
+
+        if(!HomeController.buttonsVisible)
+        {observableMovies = context.getWatchListMovies();}
+
         observableMovies.sort(new MovieComparator());
         observableMovies = FXCollections.observableArrayList(observableMovies);
         context.setObservableMovies(observableMovies);
