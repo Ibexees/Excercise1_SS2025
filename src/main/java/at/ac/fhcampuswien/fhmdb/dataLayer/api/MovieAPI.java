@@ -71,13 +71,9 @@ public class MovieAPI {
 
 
 
-    public static String getMovies(String url) throws MovieAPIException, IOException {
-        HttpURLConnection connection = createHttpConnection(url);
-        return readResponse(connection);
-    }
 
 
-    public static MovieAPIRequestBuilder builder() {
+    public static MovieAPIRequestBuilder builder() { // Builder Pattern
         return new MovieAPIRequestBuilder("https://prog2.fh-campuswien.ac.at/movies");
     }
 
